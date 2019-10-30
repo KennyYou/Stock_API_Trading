@@ -2,14 +2,19 @@
 <html>
 <body>
 <head>
-<h1> Welcome to the Stocks Page! </h1>
+<h1> Welcome to the Sotcks Page! </h1>
 <p> Brought to you by: Potato Situation </p>
-<?php 
-session_start();
-if ($_SESSION['logged'] == true) {
+ <?php 
+ session_start(); 
+if ($_SESSION['logged'] == true) 
+{
    echo $_SESSION["username"];
+//echo "USER NAME DISPLAYED";
+   //$user = $_SESSION["user"];
+  // echo $user;
 }
-?>
+//echo "USER NOT DISPLAYED";
+ ?>
 </head>
 <body>
 
@@ -67,7 +72,6 @@ $response = $client->send_request($request);
 //PHP_EOL should echo in from backend
 echo "".PHP_EOL;
 print_r($response);
-
 echo"\n";
 }
 
