@@ -7,7 +7,7 @@
 <?php 
 session_start();
 if ($_SESSION['logged'] == true) {
-   echo "Logged in as: " + <b>$_SESSION["username"]</b>;
+   echo $_SESSION["username"];
 ?>
 </head>
 <body>
