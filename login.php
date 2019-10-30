@@ -53,8 +53,8 @@ if ($response == 0) {
 
 
 else {
-	$name = $_SESSION['username'];
-	//$date = date_create();
+	$_SESSION["logged"] = true;
+	$_SESSION["username"] = $request['username'];
 	header("Location: loginsuccess.php");
 }
 ?>
