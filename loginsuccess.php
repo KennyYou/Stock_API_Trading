@@ -10,8 +10,8 @@ if ($_SESSION['logged'] == true)
 {
    echo $_SESSION["username"];
 //echo "USER NAME DISPLAYED";
-   //$user = $_SESSION["user"];
-  // echo $user;
+//$user = $_SESSION["user"];
+// echo $user;
 }
 //echo "USER NOT DISPLAYED";
  ?>
@@ -75,6 +75,31 @@ print_r($response);
 echo"\n";
 }
 
+//Request Balance automatically
+require_once('path.inc');
+require_once('get_host_info.inc');
+require_once('rabbitMQLib.inc');
+$client = new rabbitMQClient("testRabbitMQ.ini","testServer");
+if (isset($argv[1]))
+{
+  $msg = $argv[1];
+}
+else
+{
+  $msg = "requestBalance";
+}
+
+//Send search request over
+$request['type'] = "requestBalance";
+$request['username'] = $_SESSION["username"];
+$request['message'] = $msg;
+
+
+$response = $client->send_request($request);
+//PHP_EOL should echo in from backend
+echo "".PHP_EOL;
+print_r($response['bal']);
+echo"\n";
 
 ?>
 
