@@ -4,9 +4,11 @@
 <head>
 <h1> Welcome to the Sotcks Page! </h1>
 <p> Brought to you by: Potato Situation </p>
- <?php 
- session_start(); 
- ?>
+<?php 
+session_start();
+if ($_SESSION['logged'] == true) {
+   echo "Logged in as: " + <b>$_SESSION["username"]</b>;
+?>
 </head>
 <body>
 
