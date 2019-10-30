@@ -8,6 +8,7 @@
 session_start();
 if ($_SESSION['logged'] == true) {
    echo $_SESSION["username"];
+}
 ?>
 </head>
 <body>
