@@ -4,9 +4,9 @@
 
 <div class="topnav">
 
-<a class="active" href="#HOME">Home</a> 
+<a class="active" href="loginsuccess.php">Home</a> 
 <a class="active" href="profile">Portfolio</a> 
-<a class="active" href="home.php">Buy</a> 
+<a class="active" href="buy.php">Buy</a> 
 <a class="active" href="index.html">Logout<a>
 </div>
 
