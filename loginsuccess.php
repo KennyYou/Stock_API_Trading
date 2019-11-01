@@ -24,7 +24,7 @@ if ($_SESSION['logged'] == true)
 <a class="active" href="#profile">PROFILE</a> 
 <a class="active" href="#Suggestions">SUGGESTIONS</a> 
 <a class="active" href="#buy">BUY</a> 
-<a class="active" href="#sell">SELL</a> 
+<a class="active" href="sell.php">SELL</a> 
 <a class="active" href="index.html">Logout<a>
 </div>
 
