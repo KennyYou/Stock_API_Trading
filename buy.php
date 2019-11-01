@@ -18,7 +18,7 @@
 How many stocks do you want to buy?
 <br>
 
- <form method="POST" action="">
+ <form method="POST">
   <input type="text" name="amount" placeholder="Enter a amount" required><br> 
   <input type="text" name="symbol" placeholder="Enter a stock symbol" required><br>
 
@@ -26,7 +26,8 @@ How many stocks do you want to buy?
 </form>
 
 <?php
-if(isset($_POST['buy'])){
+
+if(isset($_POST['amount'])){
 session_start();
 require_once('path.inc');
 require_once('get_host_info.inc');
@@ -60,6 +61,7 @@ echo "".PHP_EOL;
 print_r($response);
 echo"\n";
 }
+
 ?>
 
 
