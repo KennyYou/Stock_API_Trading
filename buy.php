@@ -26,7 +26,7 @@ How many stocks do you want to buy?
 </form>
 
 <?php
-if(isset($_POST['search'])){
+if(isset($_POST['buy'])){
 session_start();
 require_once('path.inc');
 require_once('get_host_info.inc');
