@@ -35,11 +35,10 @@ else
 }
 
 //Send search request over
-$request['message'] = $msg;
 $request = array();
 $request['type'] = "showOwnedStock";
 $request['username'] = $_SESSION["username"];
-
+echo "<br>";
 //Send msg
 $request['message'] = $msg;
 
@@ -48,7 +47,7 @@ $response = $client->send_request($request);
 echo "".PHP_EOL;
 print_r($response);
 echo"\n";
-}
+
 
 ?>
 
