@@ -25,6 +25,7 @@ if ($_SESSION['logged'] == true)
 <a class="active" href="profile.php">PROFILE</a> 
 <a class="active" href="buy.php">BUY</a> 
 <a class="active" href="sell.php">SELL</a> 
+<a class="active" href="graph.html">GRAPH</a> 
 <a class="active" href="index.html">Logout<a>
 </div>
 
@@ -129,10 +130,7 @@ $request['type'] = "search1N";
 $request['search1N'] = $_POST['search1N'];
 $request['message'] = $msg;
 $response = $client->send_request($request);
-//PHP_EOL should echo in from backend
-echo "".PHP_EOL;
-print_r($response);
-echo"\n";
+
 }
 
 
