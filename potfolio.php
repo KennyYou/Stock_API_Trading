@@ -47,8 +47,40 @@ $request['message'] = $msg;
 $response = $client->send_request($request);
 //PHP_EOL should echo in from backend
 echo "".PHP_EOL;
-print_r($response);
+
+print_r($response[0]["symbol"]);
+print_r(" ");
+print_r($response[0]["amt"]);
+echo "<br>";
+
+print_r($response[1]["symbol"]);
+print_r(" ");
+print_r($response[1]["amt"]);
+echo "<br>";
+
+
+print_r($response[2]["symbol"]);
+print_r(" ");
+print_r($response[2]["amt"]);
+echo "<br>";
+
+print_r($response[3]["symbol"]);
+print_r(" ");
+print_r($response[3]["amt"]);
+echo "<br>";
+
+print_r($response[4]["symbol"]);
+print_r(" ");
+print_r($response[4]["amt"]);
+echo "<br>";
+
+
+print_r($response[5]["symbol"]);
+print_r(" ");
+print_r($response[5]["amt"]);
+echo "<br>";
 echo"\n";
+
 
 
 ?>
