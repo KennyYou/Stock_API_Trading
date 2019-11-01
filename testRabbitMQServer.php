@@ -1,10 +1,16 @@
 #!/usr/bin/php
 <?php
+require __DIR__ . '/vendor/autoload.php';
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 include('db.php');
 
+//INITIATE API CLIENT
+use AlphaVantage\Client;
+$alpha_vantage = new Client('9J4N8FA67HVHYZG0');
+
+//FUNCTION LIST
 function doLogin($username, $password) {
 	global $db;
     // lookup username and password in database
@@ -69,7 +75,59 @@ foreach($jsonarray['bestMatches'] as $variable) {
 return $output;
 }
 
+function doRequestBalance($username) {
+	global $db;
+	//save query as variable
+	$requestBalance = mysqli_query($db, "SELECT bal FROM students WHERE username = '$username'");
+	//save fetched data from query as array
+	$fetchBalance = mysqli_fetch_array($requestBalance);
+	echo "Balance sent to client.";
+	return $fetchBalance;
+	errorCheck($db);
+}
 
+function doBuyStock($username, $symbol, $amount) {
+	global $db;
+	//Fetch current stock info from API
+	$stockinfo = $alpha_vantage
+    		->stock()
+    		->intraday($symbol, AlphaVantage\Resources\Stock::INTERVAL_1MIN);
+	$fetchedsymbol = $stockinfo["Meta Data"]["2. Symbol"];
+	//Check if symbol exists
+	if ($symbol != $fetchedsymbol)
+		return "ERROR! Invalid symbol detected!";
+	//Get stock LOW as buy price (NBBO)
+	$stocktime = $stockinfo["Meta Data"]["3. Last Refreshed"];
+	$stockpricestring = $stockinfo["Time Series (1min)"][$stocktime]["3. low"];
+	//convert price and amount to float, multiply stock by amount, then round.
+	$stockprice = floatval($stockpricestring);
+	$i_amount = intval($amount);
+	$t = $stockprice * $i_amount;
+	$total = round($t,2);
+	//Fetch user data from students
+	$s = "select * from students where BINARY username = '$username'";
+	($table = mysqli_query( $db,  $s ) )  or die( mysqli_error($db) );
+	while ( $r = mysqli_fetch_array($table,MYSQLI_ASSOC) ) 
+	{
+		$bal= $r["bal"];
+		if ($bal - $total < 0)
+		{
+			return "ERROR! Insufficent funds for stock purchase!";
+		}
+	};
+	$s = "update students set bal = bal - '$total' where BINARY username = '$username' ";
+	mysqli_query ($db, $s);
+	$s = "insert into trading (username, type, symbol, shares, date, cost) values ('$username', 'buying', '$symbol', '$i_amount', NOW(), $total)";
+	mysqli_query ($db, $s);
+	$s = "insert into ".$username."_stocks (symbol, amt) values ('$symbol',)";
+	mysqli_query ($db, $s);
+
+	return "Your transaction was successful! You have bought ".$i_amount." shares of ".$symbol." stock for $".$total."!";
+	errorCheck($db);
+}
+	
+
+//CODE "STARTS" HERE (server recieves requests then chooses function)
 function requestProcessor($request) {
 	echo "Received a request".PHP_EOL;
 	var_dump($request);
@@ -89,6 +147,12 @@ function requestProcessor($request) {
 
 	case "search":
 		return doSearch($request['search']);
+
+	case "requestBalance":
+		return doRequestBalance($request['username']);
+
+	case "buyStock":
+		return doBuyStock($request['username'], $request['symbol'], $request['amount']);
 	}
 	return array("returnCode" => '0', 'message'=>"Server received request and processed.");
 }
