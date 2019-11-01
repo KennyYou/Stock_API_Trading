@@ -100,6 +100,7 @@ $request['message'] = $msg;
 $response = $client->send_request($request);
 //PHP_EOL should echo in from backend
 echo "".PHP_EOL;
+echo "Balance is: ";
 print_r($response['bal']);
 echo"\n";
 ?>
@@ -122,17 +123,13 @@ else
 {
   $msg = "search1N";
 }
+
 //Send search request over
 $request['type'] = "search1N";
 $request['search1N'] = $_POST['search1N'];
 $request['message'] = $msg;
 $response = $client->send_request($request);
-//PHP_EOL should echo in from backend
 
-echo "".PHP_EOL;
-echo "Balance is: ";
-print_r($response);
-echo"\n";
 }
 
 
