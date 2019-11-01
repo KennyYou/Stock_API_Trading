@@ -82,8 +82,15 @@ function doDetailSearch($search) {
 	$curl_results = curl_exec($ch);
 	curl_close($ch);
 
-$jsonarray = json_decode($curl_results, true); 
-	
+$jsonarray = json_decode($curl_results, true);
+$output .= "<th>Symbol</th>";
+$output .= "<th>Name</th>";
+$output .= "<th>Open</th>";
+$output .= "<th>High</th>";
+$output .= "<th>Low</th>";
+$output .= "<th>Close</th>";
+$output .= "<th>Volume</th>";
+$output .= "</tr>";
 $symbol = $jsonarray['bestMatches'][0]['1. symbol'];
 $name = $jsonarray['bestMatches'][0]['2. name'];
 //Curl for each symbol and get open, high, low, and close.
@@ -123,9 +130,14 @@ function doRequestBalance($username) {
 
 function doShowOwnedStock($username) {
 	global $db;
-	$ShowOwnedStock = mysqli_query($db, "SELECT symbol FROM ".$username."_stocks");
-	}
-
+	$ShowOwnedStock = mysqli_query($db, "SELECT symbol, amt FROM ".$username."_stocks");
+	$fetchStock = array();
+	while ($row_user = mysqli_fetch_assoc($ShowOwnedStock))
+		$fetchStock[] = $row_user;
+	echo "Stocks sent to client.";
+	return $fetchStock;
+	errorCheck($db);
+}
 function doBuyStock($username, $symbol, $amount) {
 	global $db;
 	//Fetch current stock info from API
