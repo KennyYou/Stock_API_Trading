@@ -4,41 +4,62 @@
 
 <div class="topnav">
 
-<a class="active" href="loginsuccess.php">Home</a> 
-<a class="active" href="#profile">Portfolio</a> 
-<a class="active" href="buy.php">BUY</a> 
+<a class="active" href="#HOME">Home</a> 
+<a class="active" href="profile">Portfolio</a> 
+<a class="active" href="home.php">Buy</a> 
 <a class="active" href="index.html">Logout<a>
 </div>
 
-<h2>Welcome to Stock Trasaction</h2>
-
-<?php
-session_start();
-$symbol = $_SESSION['symbol'];
-$currPrice = $_SESSION['currPrice'];
-echo "Hello $username";
-echo nl2br ("\n");
-echo "Sybmol : $symbol";
-echo nl2br ("\n");
-echo "Current Price : $currPrice";
-?>
 
 
-
+<h2>Welcome to Stock Transaction</h2>
 
 <br>
-How many stocks do you want to sell ?
+How many stocks do you want to sell?
 <br>
 
- <form method="POST" action="">
-  <input type="text" name="search"><br>
-     <input type="text" name="search" placeholder="Enter a stock symbol" required><br>
+ <form method="POST" >
+  <input type="text" name="amount" placeholder="Enter a amount" required><br> 
+  <input type="text" name="symbol" placeholder="Enter a stock symbol" required><br>
+
   <button type="submit"> Submit </button>
 </form>
 
 <?php
-$quantity = $_POST['search'];
-echo "You are selling  these $quantity stocks of $symbol";
+
+session_start();
+require_once('path.inc');
+require_once('get_host_info.inc');
+require_once('rabbitMQLib.inc');
+$client = new rabbitMQClient("testRabbitMQ.ini","testServer");
+if (isset($argv[1]))
+{
+  $msg = $argv[1];
+}
+else
+{
+  $msg = "sellStock";
+}
+
+//Send search request over
+$request['search'] = $_POST['search'];
+$request['message'] = $msg;
+$request = array();
+$request['type'] = "sellStock";
+$request['username'] = $_SESSION["username"];
+
+$request['amount'] = $_POST['amount'];
+$request['symbol'] = $_POST['symbol'];
+
+//Send msg
+$request['message'] = $msg;
+
+$response = $client->send_request($request);
+//PHP_EOL should echo in from backend
+echo "".PHP_EOL;
+print_r($response);
+echo"\n";
+
 ?>
 
 
