@@ -129,7 +129,7 @@ $request['message'] = $msg;
 $response = $client->send_request($request);
 //PHP_EOL should echo in from backend
 
-echo "Balance is: ".PHP_EOL;
+echo "".PHP_EOL;
 echo "Balance is: ";
 print_r($response);
 echo"\n";
