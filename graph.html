@@ -11,7 +11,7 @@ var chart = new CanvasJS.Chart("chartContainer", {
 	theme: "light2", // "light1", "light2", "dark1", "dark2"
 	exportEnabled: true,
 	title: {
-		text: "Netflix Stock Price in 2016"
+		text: "Your Stock Price "
 	},
 	subtitles: [{
 		text: "Weekly Averages"
@@ -35,7 +35,7 @@ var chart = new CanvasJS.Chart("chartContainer", {
 	}]
 });
 
-$.get("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=Y&apikey=9J4N8FA67HVHYZG0&datatype=csv", getDataPointsFromCSV);
+$.get("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=GOOG&apikey=9J4N8FA67HVHYZG0&datatype=csv", getDataPointsFromCSV);
 
 function getDataPointsFromCSV(csv) {
 	var csvLines = points = [];
