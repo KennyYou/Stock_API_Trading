@@ -6,7 +6,7 @@
 
 <a class="active" href="#HOME">Home</a> 
 <a class="active" href="#profile">Portfolio</a> 
-<a class="active" href="sell.html">Sell</a> 
+<a class="active" href="buy.php">BUY</a> 
 <a class="active" href="index.html">Logout<a>
 </div>
 
