@@ -39,6 +39,8 @@ $request = array();
 $request['type'] = "showOwnedStock";
 $request['username'] = $_SESSION["username"];
 echo "<br>";
+echo"Your stocks are as follows:";
+echo "<br>";
 //Send msg
 $request['message'] = $msg;
 
