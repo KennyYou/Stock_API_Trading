@@ -2,16 +2,17 @@
 <html>
 <body>
 <head>
-<h1> Welcome to the Stocks Page! </h1>
+<h1> Welcome to the Sotcks Page! </h1>
 <p> Brought to you by: Potato Situation </p>
  <?php 
  session_start(); 
 if ($_SESSION['logged'] == true) 
 {
+   echo "Welcome: ";
    echo $_SESSION["username"];
 //echo "USER NAME DISPLAYED";
-//$user = $_SESSION["user"];
-// echo $user;
+   //$user = $_SESSION["user"];
+  // echo $user;
 }
 //echo "USER NOT DISPLAYED";
  ?>
@@ -20,8 +21,8 @@ if ($_SESSION['logged'] == true)
 
 <div class="topnav">
 
-<a class="active" href="loginsuccess.php">HOME</a> 
-<a class="active" href="#profile">PROFILE</a> 
+<a class="active" href="#HOME">HOME</a> 
+<a class="active" href="profile.php">PROFILE</a> 
 <a class="active" href="#Suggestions">SUGGESTIONS</a> 
 <a class="active" href="buy.php">BUY</a> 
 <a class="active" href="sell.php">SELL</a> 
@@ -75,7 +76,7 @@ print_r($response);
 echo"\n";
 }
 
-//Request Balance automatically
+//Request balance
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
