@@ -81,8 +81,40 @@ print_r($response[5]["amt"]);
 echo "<br>";
 echo"\n";
 
+//Printing out transaction history 
+if (isset($argv[1]))
+{
+  $msg1 = $argv[1];
+}
+else
+{
+  $msg1 = "showTrading";
+}
 
+$request1 = array();
+$request1['type'] = "showTrading";
+$request1['username'] = $_SESSION["username"];
+echo "<br>";
+echo"Your transaction history are as follows:";
+echo "<br>";
+//Send msg
+$request1['message'] = $msg1;
 
+$response1 = $client->send_request($request1);
+//PHP_EOL should echo in from backend displaying transaction history 
+echo "".PHP_EOL;
+for ($i = 0; $i < count($request1); $i++) {
+    print_r($response[$i]['type']);
+	print_r(" ");
+    print_r($response[$i]['symbol']);
+	print_r(" ");
+    print_r($response[$i]['shares']);
+	print_r(" ");
+    print_r($response[$i]['date']);
+	print_r(" ");
+    print_r($response[$i]['cost']);
+	echo "<br>";
+}
 ?>
 
 
