@@ -138,6 +138,18 @@ function doShowOwnedStock($username) {
 	return $fetchStock;
 	errorCheck($db);
 }
+
+function doShowTrading($username) {
+	global $db;
+	$ShowTrading = mysqli_query($db, "SELECT type, symbol, shares, date, cost FROM trading WHERE username = ".$username."");
+	$fetchTrading = array();
+	while ($row_user = mysqli_fetch_assoc($ShowTrading))
+		$fetchTrading[] = $row_user;
+	echo "Trade history sent to client.";
+	return $fetchTrading;
+	errorCheck($db);
+}
+
 function doBuyStock($username, $symbol, $amount) {
 	global $db;
 	//Fetch current stock info from API
@@ -263,6 +275,9 @@ function requestProcessor($request) {
 
 	case "showOwnedStock":
 		return doShowOwnedStock($request['username']);
+
+	case "showTrading":
+		return doShowTrading($request['username']);
 
 	case "buyStock":
 		return doBuyStock($request['username'], $request['symbol'], $request['amount']);
