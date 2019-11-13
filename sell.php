@@ -5,7 +5,7 @@
 <div class="topnav">
 
 <a class="active" href="loginsuccess.php">Home</a> 
-<a class="active" href="portfolio.php">Portfolio</a> 
+<a class="active" href="portfolio.php">Profile</a> 
 <a class="active" href="buy.php">Buy</a> 
 <a class="active" href="index.html">Logout<a>
 </div>
