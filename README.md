@@ -97,5 +97,8 @@ TBA
 ## Connecting the AlphaVantage API
 TBA
 
+## Getting Distributed Logging Set Up
+TBA
+
 ## Using Listeners with systemd
 TBA
