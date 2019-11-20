@@ -29,6 +29,10 @@ $request['username'] = $_POST['username'];
 $request['password'] = $_POST['pass'];
 $request['message'] = $msg;
 
+for ($x = 0; $x <= 3; $x++) {
+echo "REQUEST ERROR!" . PHP_EOL;
+logger( __FILE__ . " : " . __LINE__ . " :error: " . "CHECK CONNECTION");
+}
 
 $response = $client->send_request($request);
 echo "Request Failure".PHP_EOL;
@@ -40,8 +44,12 @@ if ($response == 0) {
 	//$date = date_create();
 	header("location:loginerror.html");
 	echo "REQUEST ERROR!" . PHP_EOL;
-	logger( __FILE__ . " : " . __LINE__ . " :error: " . "Bad Request Type, check connection with database");
+for ($x = 0; $x <= 3; $x++) {
+echo "REQUEST ERROR!" . PHP_EOL;
+logger( __FILE__ . " : " . __LINE__ . " :error: " . "Bad Request Type, check connection with database");
 	}
+}	
+	
 else {
 	$_SESSION['logged'] = true;
 	$_SESSION["username"] = $request['username'];
