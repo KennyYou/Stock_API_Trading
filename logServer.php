@@ -15,6 +15,7 @@ function logging($log)
 }
 
 $server = new rabbitMQServer("rabbitMQErrorLog.ini","testServer");
+//Running to check connection is active
 echo var_dump($server);
 
 $server->process_requests('logging');
