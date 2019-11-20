@@ -4,11 +4,9 @@ require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
-
-
 function logProcessor($log)
 {
- 	echo "received log".PHP_EOL; 
+ 	echo "Logging Error: ".PHP_EOL; 
 	echo $log;
 	file_put_contents("/home/tmp/logs.txt",$log.PHP_EOL,FILE_USE_INCLUDE_PATH | FILE_APPEND);
 
