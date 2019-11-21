@@ -11,15 +11,12 @@ function logging($log)
 	//put file into location @ logs.txt
 	//users have to make this file
 	file_put_contents("/home/tmp/logs.txt",$log.PHP_EOL,FILE_USE_INCLUDE_PATH | FILE_APPEND);
-
 }
 
 $server = new rabbitMQServer("rabbitMQErrorLog.ini","testServer");
 //Running to check connection is active
-echo var_dump($server);
-echo "You are connected";
+echo "You are connected to the log server successfully!<br>";
 
 $server->process_requests('logging');
 exit();
 ?>
-
