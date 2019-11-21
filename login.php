@@ -7,7 +7,7 @@ ini_set('display_errors', 1);
 //Grab required files 
 session_start();
 //THIS FILE MAY NOT BE NEEDED AFTER DELETE IF NOT IN USE
-require_once('logger.inc');
+require_once('logfunction.inc');
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
