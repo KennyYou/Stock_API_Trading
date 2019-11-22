@@ -7,7 +7,7 @@ function logger($ermsg){
 	//Connect to rabbitMQ
 	$client = new rabbitMQClient("rabbitMQErrorLog.ini","testServer");
 	
-	$return = date('Y-m-d H:i:s', time())." ".gethostname()." ".$ermsg.PHP_EOL;
+	$return = date('Y-m-d') . "  | Time: " . date('H:i:s') . "  | From Host: " . gethostname() . "  |  Error Msg: " . $ermsg.PHP_EOL;
 	//Have the logs files set up on every machine
 	file_put_contents("/home/tmp/logs.txt",$return,FILE_USE_INCLUDE_PATH | FILE_APPEND);
 
