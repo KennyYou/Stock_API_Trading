@@ -6,11 +6,14 @@ require_once('rabbitMQLib.inc');
 
 function logging($log)
 {
- 	echo "Logging Error: ".PHP_EOL; 
-	echo $log;
-	//put file into location @ logs.txt
-	//users have to make this file
-	file_put_contents("/home/tmp/logs.txt",$log.PHP_EOL,FILE_USE_INCLUDE_PATH | FILE_APPEND);
+	//Ignore this testing out more detailed logs.
+	/*
+	$logFile = $log . PHP_EOL . date("h:i:sa");
+	file_put_contents("/home/tmp/logs.txt",$logFile, FILE_APPEND); 
+	*/
+	echo "Logging Error: " . PHP_EOL . " | INP: " . $log; 
+	//users have to make this file + put file into location @ logs.txt
+	file_put_contents("/home/tmp/logs.txt",$log . PHP_EOL,FILE_USE_INCLUDE_PATH | FILE_APPEND);
 }
 
 $server = new rabbitMQServer("rabbitMQErrorLog.ini","testServer");
