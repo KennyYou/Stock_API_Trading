@@ -9,7 +9,7 @@ ini_set('display_errors', 1);
 //Grab required files 
 session_start();
 //THIS FILE MAY NOT BE NEEDED AFTER DELETE IF NOT IN USE
-require_once('logger.inc');
+require_once('logfunction.inc');
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
@@ -49,14 +49,13 @@ echo "\n\n";
 if ($response == 0) {
 	//$date = date_create();
 	header("location:loginerror.html");
-	//Sends error log out 3 times
-	for ($x = 0; $x <= 3; $x++) {
-    echo "REQUEST ERROR!" . PHP_EOL;
-	logger( __FILE__ . " : " . __LINE__ . " :error: " . "Bad Request Type, check connection with database");
-	} 
-	
-	}
 
+	echo "REQUEST ERROR!" . PHP_EOL;
+for ($x = 0; $x <= 3; $x++) {
+echo "REQUEST ERROR!" . PHP_EOL;
+logger( __FILE__ . " : " . __LINE__ . " :error: " . "Bad Request Type, check connection with database");
+	}
+}	
 
 else {
 	$name = $_SESSION['username'];
