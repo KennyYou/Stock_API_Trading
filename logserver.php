@@ -21,5 +21,6 @@ $server = new rabbitMQServer("rabbitMQErrorLog.ini","testServer");
 echo "You are connected to the log server successfully!<br>";
 
 $server->process_requests('logging');
+
 exit();
 ?>
