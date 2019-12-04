@@ -13,8 +13,12 @@ $alpha_vantage = new Client('9J4N8FA67HVHYZG0');
 //FUNCTION LIST
 function doLogin($username, $password) {
 	global $db;
-    // lookup username and password in database
-	$q = mysqli_query($db, "SELECT * FROM students WHERE BINARY username = '$username' AND BINARY password = '$password'");
+	//get hash from inserted password
+	$salty = "taterswithsalt";
+	$passhash = hash('sha256',$salty.$password);
+	
+    // lookup username and password hash in database
+	$q = mysqli_query($db, "SELECT * FROM students WHERE BINARY username = '$username' AND BINARY password = '$passhash'");
 
 	// if there's an error, throw it in console	
 	if (!$q) {printf("ERROR: %s\n", mysqli_error($db));}
@@ -46,8 +50,11 @@ function doRegister($username, $password) {
 		return "The username specified already exists! Try again.";
 	}
 	else {
+		//Create password hash with salt
+		$salty = "taterswithsalt";
+		$passhash = hash('sha256',$salty.$password);
 		// no match, so insert the values into the DB
-		$q = mysqli_query($db, "INSERT INTO students (username, password, start_bal, bal) VALUES ('$username', '$password', 10000.00, 10000.00)");
+		$q = mysqli_query($db, "INSERT INTO students (username, password, start_bal, bal) VALUES ('$username', '$passhash', 10000.00, 10000.00)");
 		echo "Inserted values successfully!\n\n";
 		//Next, create stock table for user
 		$q = mysqli_query($db, "CREATE TABLE ".$username."_stocks (symbol varchar(15), amt int);");
@@ -141,7 +148,7 @@ function doShowOwnedStock($username) {
 
 function doShowTrading($username) {
 	global $db;
-	$ShowTrading = mysqli_query($db, "SELECT type, symbol, shares, date, cost FROM trading WHERE username = ".$username."");
+	$ShowTrading = mysqli_query($db, "SELECT type, symbol, shares, date, cost FROM trading WHERE username = '$username'");
 	$fetchTrading = array();
 	while ($row_user = mysqli_fetch_assoc($ShowTrading))
 		$fetchTrading[] = $row_user;
