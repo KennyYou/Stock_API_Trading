@@ -58,8 +58,9 @@ logger( __FILE__ . " : " . __LINE__ . " :error: " . "Bad Request Type, check con
 }	
 
 else {
-	$name = $_SESSION['username'];
-	//$date = date_create();
+	$_SESSION['logged'] = true;
+	$_SESSION["username"] = $request['username'];
+	//$name = $_SESSION['username'];
 	header("Location: loginsuccess.php");
 }
 ?>
