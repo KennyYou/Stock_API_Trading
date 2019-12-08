@@ -97,8 +97,12 @@ function doBuyStock($username, $symbol, $amount) {
 	$t = $stockprice * $i_amount;
 	$total = round($t,2);
 
-	//At this point, you are done with collecting API data and need database data, so idealy the needed values would be sent back to the backend through RabbitMQ. The rest of this function would be done on the backend and is unnedded here.
+	//Sending to matt
+	
+	
 
+	//At this point, you are done with collecting API data and need database data, so idealy the needed values would be sent back to the backend through RabbitMQ. The rest of this function would be done on the backend and is unnedded here.
+/*
 	//Fetch user data from students
 	$s = "select * from students where BINARY username = '$username'";
 	($table = mysqli_query( $db,  $s ) )  or die( mysqli_error($db) );
@@ -132,12 +136,14 @@ function doBuyStock($username, $symbol, $amount) {
 	echo "Successful buy!\n\n";
 	return "Your transaction was successful! You have bought ".$i_amount." shares of ".$symbol." stock for $".$total."!";
 	errorCheck($db);
+*/
+
 }
 
-function doSellStock($username, $symbol, $amount) {
+function doSellStock2($username, $symbol, $amount) {
 
 	//The beginning of this function starts on the backend, and if successful, would pass on to a dmz function
-
+/*
 	global $db;
 	//Fetch stock amounts from [username]_stocks
 	$s = "select * from ".$username."_stocks where symbol = '$symbol'";
@@ -155,7 +161,7 @@ function doSellStock($username, $symbol, $amount) {
 	}
 
 	//DMZ end starts here.
-
+*/
 	//Fetch current stock info from API
 	$alpha_vantage = new Client('9J4N8FA67HVHYZG0');
 	$stockinfo = $alpha_vantage
@@ -171,7 +177,7 @@ function doSellStock($username, $symbol, $amount) {
 	$total = round($t,2);
 
 	//Send needed values to backend. Rounding can happen either beforehand or afterwards.
-
+/*
 	$s = "update students set bal = bal + '$total' where BINARY username = '$username' ";
 	mysqli_query ($db, $s);
 	$s = "insert into trading (username, type, symbol, shares, date, cost) values ('$username', 'selling', '$symbol', '$i_amount', NOW(), $total)";
@@ -181,6 +187,9 @@ function doSellStock($username, $symbol, $amount) {
 	echo "Successful sell!\n\n";
 	return "Your transaction was successful! You have sold ".$i_amount." shares of ".$symbol." stock for $".$total."!";
 	errorCheck($db);
+*/
+
+
 }
 	
 
@@ -204,7 +213,7 @@ function requestProcessor($request) {
 	case "buyStock":
 		return doBuyStock($request['username'], $request['symbol'], $request['amount']);
 	
-	case "sellStock":
+	case "sellStock2":
 		return doSellStock($request['username'], $request['symbol'], $request['amount']);
 	}
 	return array("returnCode" => '0', 'message'=>"Server received request and processed.");
