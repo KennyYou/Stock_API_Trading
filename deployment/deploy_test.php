@@ -2,7 +2,7 @@
 require_once('include/path.inc');
 require_once('include/get_host_info.inc');
 require_once('include/rabbitMQLib.inc');
-require_once('include/logger.inc');
+
 $client = new rabbitMQClient("deploy.ini", "testserver");
 $request["type"] = "createPkg";
 $request["pkgName"] = "testPkg";
