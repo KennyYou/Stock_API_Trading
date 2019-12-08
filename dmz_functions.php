@@ -97,8 +97,35 @@ function doBuyStock($username, $symbol, $amount) {
 	$t = $stockprice * $i_amount;
 	$total = round($t,2);
 
-	//Sending to matt
+	//Sending to BE
+	$client = new rabbitMQClient("testRabbitMQ.ini","testServer");
+	if (isset($argv[1]))
+	{
+	$msg = $argv[1];
+	}
+	else
+	{
+	$msg = "buyStock2";
+	}
+	$request['message'] = $msg;
+	$request = array();
+	$request['type'] = "buyStock2";
 	
+	$request['username'] = $_SESSION["username"];
+	$request['symbol'] = $symbol;
+	$request['i_amount'] = $i_amount;
+	$request['stockprice'] = $stockprice;
+	$request['total'] = $total;
+	
+	//Send msg
+	$request['message'] = $msg;
+	$client->send_request($request);
+	//PHP_EOL should echo in from backend 
+	//May induce unintended effects
+	echo "".PHP_EOL;
+	echo "Sent buying info.";
+	//print_r($response);
+	echo"\n";
 	
 
 	//At this point, you are done with collecting API data and need database data, so idealy the needed values would be sent back to the backend through RabbitMQ. The rest of this function would be done on the backend and is unnedded here.
