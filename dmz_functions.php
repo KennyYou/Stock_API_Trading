@@ -220,7 +220,7 @@ function errorCheck($db) {
 	}
 }
 
-$server = new rabbitMQServer("testRabbitMQ.ini","testServer");
+$server = new rabbitMQServer("DMZRabbitMQ.ini","testServer");
 
 $server->process_requests('requestProcessor');
 exit();
