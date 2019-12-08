@@ -13,12 +13,15 @@ $alpha_vantage = new Client('9J4N8FA67HVHYZG0');
 //FUNCTION LIST
 function doLogin($username, $password) {
 	global $db;
+	//Sanatize username and password
+	$cleanusername = mysqli_real_escape_string($db, $username);
+	$cleanpassword = mysqli_real_escape_string($db, $password);
 	//get hash from inserted password
 	$salty = "taterswithsalt";
-	$passhash = hash('sha256',$salty.$password);
+	$passhash = hash('sha256',$salty.$cleanpassword);
 	
     // lookup username and password hash in database
-	$q = mysqli_query($db, "SELECT * FROM students WHERE BINARY username = '$username' AND BINARY password = '$passhash'");
+	$q = mysqli_query($db, "SELECT * FROM students WHERE BINARY username = '$cleanusername' AND BINARY password = '$passhash'");
 
 	// if there's an error, throw it in console	
 	if (!$q) {printf("ERROR: %s\n", mysqli_error($db));}
@@ -40,9 +43,12 @@ function doLogin($username, $password) {
 
 function doRegister($username, $password) {
 	global $db;
+	//sanitize username and password
+	$cleanusername = mysqli_real_escape_string($db, $username);
+	$cleanpassword = mysqli_real_escape_string($db, $password);
 	
 	// check to see if the username exists first
-	$q = mysqli_query($db, "SELECT * FROM students WHERE BINARY username = '$username'");
+	$q = mysqli_query($db, "SELECT * FROM students WHERE BINARY username = '$cleanusername'");
 	$c = mysqli_num_rows($q);
 	if ($c == 1) {
 		// if there's a match, send a "username exists" message
@@ -52,17 +58,17 @@ function doRegister($username, $password) {
 	else {
 		//Create password hash with salt
 		$salty = "taterswithsalt";
-		$passhash = hash('sha256',$salty.$password);
+		$passhash = hash('sha256',$salty.$cleanpassword);
 		// no match, so insert the values into the DB
-		$q = mysqli_query($db, "INSERT INTO students (username, password, start_bal, bal) VALUES ('$username', '$passhash', 10000.00, 10000.00)");
+		$q = mysqli_query($db, "INSERT INTO students (username, password, start_bal, bal) VALUES ('$cleanusername', '$passhash', 10000.00, 10000.00)");
 		echo "Inserted values successfully!\n\n";
 		//Next, create stock table for user
-		$q = mysqli_query($db, "CREATE TABLE ".$username."_stocks (symbol varchar(15), amt int);");
+		$q = mysqli_query($db, "CREATE TABLE ".$cleanusername."_stocks (symbol varchar(15), amt int);");
 		return "Registration successful!";
 	}
 	errorCheck($db);
 }
-
+/*
 function doSearch($search) {
 	$ch = curl_init("https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=" . $search . "&apikey=9J4N8FA67HVHYZG0");
 	curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -123,7 +129,7 @@ $output .= "<td>".$volume." </td>";
 $output .= "</tr>";
 return $output;
 }
-
+*/
 function doRequestBalance($username) {
 	global $db;
 	//save query as variable
@@ -157,8 +163,9 @@ function doShowTrading($username) {
 	errorCheck($db);
 }
 
-function doBuyStock($username, $symbol, $amount) {
+function doBuyStock2($username, $symbol, $amount) {
 	global $db;
+/*
 	//Fetch current stock info from API
 	$alpha_vantage = new Client('9J4N8FA67HVHYZG0');
 	$stockinfo = $alpha_vantage
@@ -176,6 +183,7 @@ function doBuyStock($username, $symbol, $amount) {
 	$i_amount = intval($amount);
 	$t = $stockprice * $i_amount;
 	$total = round($t,2);
+*/
 	//Fetch user data from students
 	$s = "select * from students where BINARY username = '$username'";
 	($table = mysqli_query( $db,  $s ) )  or die( mysqli_error($db) );
@@ -227,6 +235,7 @@ function doSellStock($username, $symbol, $amount) {
 		echo "User doesn't have enough stock!\n\n";
 		return "ERROR! You don't have enough of that stock!";
 	}
+/*
 	//Fetch current stock info from API
 	$alpha_vantage = new Client('9J4N8FA67HVHYZG0');
 	$stockinfo = $alpha_vantage
@@ -240,6 +249,7 @@ function doSellStock($username, $symbol, $amount) {
 	$i_amount = intval($amount);
 	$t = $stockprice * $i_amount;
 	$total = round($t,2);
+*/
 	$s = "update students set bal = bal + '$total' where BINARY username = '$username' ";
 	mysqli_query ($db, $s);
 	$s = "insert into trading (username, type, symbol, shares, date, cost) values ('$username', 'selling', '$symbol', '$i_amount', NOW(), $total)";
@@ -271,12 +281,12 @@ function requestProcessor($request) {
 	case "validate_session":
 		return doValidate($request['sessionId']);
 
-	case "search1S":
+	/*case "search1S":
 		return doSearch($request['search1S']);
 
 	case "search1N":
 		return doDetailSearch($request['search1N']);
-
+*/
 	case "requestBalance":
 		return doRequestBalance($request['username']);
 
@@ -286,7 +296,7 @@ function requestProcessor($request) {
 	case "showTrading":
 		return doShowTrading($request['username']);
 
-	case "buyStock":
+	case "buyStock2":
 		return doBuyStock($request['username'], $request['symbol'], $request['amount']);
 	
 	case "sellStock":
