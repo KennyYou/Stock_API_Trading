@@ -5,7 +5,6 @@ require_once __DIR__ . '/vendor/autoload.php';
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
-include('db.php');
 
 //INITIATE API CLIENT
 use AlphaVantage\Client;
