@@ -111,7 +111,7 @@ function doBuyStock($username, $symbol, $amount) {
 	$request = array();
 	$request['type'] = "buyStock2";
 	
-	$request['username'] = $_SESSION["username"];
+	$request['username'] = $username;
 	$request['symbol'] = $symbol;
 	$request['i_amount'] = $i_amount;
 	$request['stockprice'] = $stockprice;
