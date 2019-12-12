@@ -167,7 +167,6 @@ $client = new rabbitMQClient("DMZRabbitMQ.ini","testServer");
 	$request = array();
 	$request['type'] = "buyStock2";
 	//send buy variables to DMZ end
-	$request['username'] = $username;
 	$request['amount'] = $amount;
 	$request['symbol'] = $symbol;
 	$request['message'] = $msg;
@@ -248,7 +247,6 @@ function doSellStock($username, $symbol, $amount) {
 	$request = array();
 	$request['type'] = "sellStock2";
 	//send sell variables to DMZ end
-	$request['username'] = $username;
 	$request['amount'] = $amount;
 	$request['symbol'] = $symbol;
 	$request['message'] = $msg;
@@ -264,21 +262,6 @@ function doSellStock($username, $symbol, $amount) {
 	$i_amount = $response[0];
 	$total = $response[1];
 
-/*
-	//Fetch current stock info from API
-	$alpha_vantage = new Client('9J4N8FA67HVHYZG0');
-	$stockinfo = $alpha_vantage
-    	->stock()
-    	->intraday($symbol, AlphaVantage\Resources\Stock::INTERVAL_1MIN);
-	//Get stock HIGH as sell price (NBBO)
-	$stocktime = $stockinfo["Meta Data"]["3. Last Refreshed"];
-	$stockpricestring = $stockinfo["Time Series (1min)"][$stocktime]["2. high"];
-	//convert price and amount to float, multiply stock by amount, then round.
-	$stockprice = floatval($stockpricestring);
-	$i_amount = intval($amount);
-	$t = $stockprice * $i_amount;
-	$total = round($t,2);
-*/
 	$s = "update students set bal = bal + '$total' where BINARY username = '$username' ";
 	mysqli_query ($db, $s);
 	$s = "insert into trading (username, type, symbol, shares, date, cost) values ('$username', 'selling', '$symbol', '$i_amount', NOW(), $total)";
