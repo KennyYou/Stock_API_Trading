@@ -89,7 +89,7 @@ function doSearch($search) {
 	echo"\n";
 
 	//return API data
-	return $response
+	return $response;
 }
 
 function doDetailSearch($search) {
@@ -116,7 +116,7 @@ function doDetailSearch($search) {
 	echo"\n";
 
 	//return API data
-	return $response
+	return $response;
 
 }
 function doRequestBalance($username) {
@@ -180,8 +180,8 @@ $client = new rabbitMQClient("DMZRabbitMQ.ini","testServer");
 	echo"\n";
 
 	//set new variables from fetched API info
-	$i_amount = $response[0]
-	$total = $response[1]
+	$i_amount = $response[0];
+	$total = $response[1];
 
 	//Fetch user data from students
 	$s = "select * from students where BINARY username = '$username'";
@@ -315,7 +315,7 @@ function requestProcessor($request) {
 
 	case "search1N":
 		return doDetailSearch($request['search1N']);
-*/
+
 	case "requestBalance":
 		return doRequestBalance($request['username']);
 
