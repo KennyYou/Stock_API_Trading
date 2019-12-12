@@ -293,7 +293,6 @@ function doSellStock($username, $symbol, $amount) {
 
 //CODE "STARTS" HERE (server recieves requests then chooses function)
 function requestProcessor($request) {
-	$alpha_vantage = new Client('9J4N8FA67HVHYZG0');
 	echo "Received a request".PHP_EOL;
 	var_dump($request);
 	if(!isset($request['type'])) {
