@@ -269,6 +269,9 @@ function doSellStock($username, $symbol, $amount) {
 	$s = "update ".$username."_stocks set amt = amt - '$i_amount' where symbol = '$symbol' ";
 	mysqli_query ($db, $s);
 	echo "Successful sell!\n\n";
+	//Drop stock from table if all stocks from that specific share are sold
+	$s = "DELETE FROM ".$username."_stocks WHERE amt ='0'";
+	mysqli_query ($db, $s);
 	return "Your transaction was successful! You have sold ".$i_amount." shares of ".$symbol." stock for $".$total."!";
 	errorCheck($db);
 }
