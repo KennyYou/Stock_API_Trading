@@ -77,7 +77,7 @@ return $output;
 //send output back to backend
 }
 
-function doBuyStock($username, $symbol, $amount) {
+function doBuyStock($symbol, $amount) {
 	global $db;
 	//Fetch current stock info from API
 	$alpha_vantage = new Client('9J4N8FA67HVHYZG0');
@@ -96,36 +96,11 @@ function doBuyStock($username, $symbol, $amount) {
 	$i_amount = intval($amount);
 	$t = $stockprice * $i_amount;
 	$total = round($t,2);
-
-	//Sending to BE
-	$client = new rabbitMQClient("testRabbitMQ.ini","testServer");
-	if (isset($argv[1]))
-	{
-	$msg = $argv[1];
-	}
-	else
-	{
-	$msg = "buyStock2";
-	}
-	$request['message'] = $msg;
-	$request = array();
-	$request['type'] = "buyStock2";
-	
-	$request['username'] = $username;
-	$request['symbol'] = $symbol;
-	$request['i_amount'] = $i_amount;
-	$request['stockprice'] = $stockprice;
-	$request['total'] = $total;
-	
-	//Send msg
-	$request['message'] = $msg;
-	$client->send_request($request);
-	//PHP_EOL should echo in from backend 
-	//May induce unintended effects
-	echo "".PHP_EOL;
+	$buyarray = array($i_amount, $total);
 	echo "Sent buying info.";
 	//print_r($response);
 	echo"\n";
+	return $buyarray;
 	
 
 	//At this point, you are done with collecting API data and need database data, so idealy the needed values would be sent back to the backend through RabbitMQ. The rest of this function would be done on the backend and is unnedded here.
@@ -167,7 +142,7 @@ function doBuyStock($username, $symbol, $amount) {
 
 }
 
-function doSellStock2($username, $symbol, $amount) {
+function doSellStock($symbol, $amount) {
 
 	//The beginning of this function starts on the backend, and if successful, would pass on to a dmz function
 /*
@@ -202,6 +177,8 @@ function doSellStock2($username, $symbol, $amount) {
 	$i_amount = intval($amount);
 	$t = $stockprice * $i_amount;
 	$total = round($t,2);
+	$sellarray = array($i_amount, $total);
+	return $sellarray;
 
 	//Send needed values to backend. Rounding can happen either beforehand or afterwards.
 /*
@@ -231,17 +208,17 @@ function requestProcessor($request) {
 	
 	switch ($request['type']) {
 
-	case "search1S":
-		return doSearch($request['search1S']);
+	case "search2S":
+		return doSearch($request['search2S']);
 
-	case "search1N":
-		return doDetailSearch($request['search1N']);
+	case "search2N":
+		return doDetailSearch($request['search2N']);
 
-	case "buyStock":
-		return doBuyStock($request['username'], $request['symbol'], $request['amount']);
+	case "buyStock2":
+		return doBuyStock($request['symbol'], $request['amount']);
 	
 	case "sellStock2":
-		return doSellStock($request['username'], $request['symbol'], $request['amount']);
+		return doSellStock($request['symbol'], $request['amount']);
 	}
 	return array("returnCode" => '0', 'message'=>"Server received request and processed.");
 }
