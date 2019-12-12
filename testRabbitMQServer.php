@@ -168,8 +168,8 @@ $client = new rabbitMQClient("DMZRabbitMQ.ini","testServer");
 	$request['type'] = "buyStock2";
 	//send buy variables to DMZ end
 	$request['username'] = $username;
-	$request['amount'] = $symbol;
-	$request['symbol'] = $amount;
+	$request['amount'] = $amount;
+	$request['symbol'] = $symbol;
 	$request['message'] = $msg;
 	//recieve api info from DMZ as variable
 	$response = $client->send_request($request);
@@ -249,8 +249,8 @@ function doSellStock($username, $symbol, $amount) {
 	$request['type'] = "sellStock2";
 	//send sell variables to DMZ end
 	$request['username'] = $username;
-	$request['amount'] = $symbol;
-	$request['symbol'] = $amount;
+	$request['amount'] = $amount;
+	$request['symbol'] = $symbol;
 	$request['message'] = $msg;
 	//set new variables from fetched API info
 	$response = $client->send_request($request);
