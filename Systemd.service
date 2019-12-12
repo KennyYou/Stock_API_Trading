@@ -1,4 +1,4 @@
-Unit]
+[Unit]
 Description=RMQ Startup
 After=network.target
 StartLimitIntervalSec=0
@@ -6,7 +6,7 @@ StartLimitIntervalSec=0
 [Service]
 Restart=always
 User=cvarkey
-ExecStart=/usr/bin/php home/cvarkey/GitGood/Backend/testRabbitMQServer.php
+ExecStart=/usr/bin/php /home/mpm54/git/rabbitmqphp_example/testRabbitMQServer.php
 
 
 [Install]
