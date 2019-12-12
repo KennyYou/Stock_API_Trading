@@ -6,10 +6,6 @@ require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 include('db.php');
 
-//INITIATE API CLIENT
-use AlphaVantage\Client;
-$alpha_vantage = new Client('9J4N8FA67HVHYZG0');
-
 //FUNCTION LIST
 function doLogin($username, $password) {
 	global $db;
@@ -68,68 +64,61 @@ function doRegister($username, $password) {
 	}
 	errorCheck($db);
 }
-/*
-function doSearch($search) {
-	$ch = curl_init("https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=" . $search . "&apikey=9J4N8FA67HVHYZG0");
-	curl_setopt($ch, CURLOPT_HEADER, 0);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-	$curl_results = curl_exec($ch);
-	curl_close($ch);
 
-$jsonarray = json_decode($curl_results, true); 
-foreach($jsonarray['bestMatches'] as $variable) {
-	
-	$symbol = $variable['1. symbol'];
-	$name = $variable['2. name'];
-	$output .= "<td>".$symbol." </td>";
-	$output .= "<td>".$name." </td>";
- 	$output .= "</tr>";
+function doSearch($search) {
+
+	$client = new rabbitMQClient("DMZRabbitMQ.ini","testServer");
+	if (isset($argv[1]))
+	{
+	$msg = $argv[1];
 	}
-return $output;
+	else
+	{
+	$msg = "search2S";
+	}
+	$request = array();
+	$request['type'] = "search2S";
+	//send search to DMZ end
+	$request['search2S'] = $search;
+	//Get response and save as variable
+	$response = $client->send_request($request);
+	//PHP_EOL should echo in from backend 
+	//May induce unintended effects
+	echo "".PHP_EOL;
+	echo "Sent search info.";
+	echo"\n";
+
+	//return API data
+	return $response
 }
 
 function doDetailSearch($search) {
-	$ch = curl_init("https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=" . $search . "&apikey=9J4N8FA67HVHYZG0");
-	curl_setopt($ch, CURLOPT_HEADER, 0);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-	$curl_results = curl_exec($ch);
-	curl_close($ch);
 
-$jsonarray = json_decode($curl_results, true);
-$output .= "<th>Symbol</th>";
-$output .= "<th>Name</th>";
-$output .= "<th>Open</th>";
-$output .= "<th>High</th>";
-$output .= "<th>Low</th>";
-$output .= "<th>Close</th>";
-$output .= "<th>Volume</th>";
-$output .= "</tr>";
-$symbol = $jsonarray['bestMatches'][0]['1. symbol'];
-$name = $jsonarray['bestMatches'][0]['2. name'];
-//Curl for each symbol and get open, high, low, and close.
-$ch2 = curl_init("https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=".$symbol."&interval=1min&apikey=9J4N8FA67HVHYZG0");
-curl_setopt($ch2, CURLOPT_HEADER, 0);
-curl_setopt($ch2, CURLOPT_RETURNTRANSFER, TRUE);
-$curl_results2 = curl_exec($ch2);
-curl_close($ch2);
-$jsonarray2 = json_decode($curl_results2, true);
-$time = $jsonarray2['Meta Data']['3. Last Refreshed'];
-$open = $jsonarray2['Time Series (1min)'][$time]['1. open'];
-$high = $jsonarray2['Time Series (1min)'][$time]['2. high'];
-$low = $jsonarray2['Time Series (1min)'][$time]['3. low'];
-$close = $jsonarray2['Time Series (1min)'][$time]['4. close'];
-$volume = $jsonarray2['Time Series (1min)'][$time]['5. volume'];
-$output .= "<td>".$symbol." </td>";
-$output .= "<td>".$name." </td>";
-$output .= "<td>".$open." </td>";
-$output .= "<td>".$high." </td>";
-$output .= "<td>".$low." </td>";
-$output .= "<td>".$close." </td>";
-$output .= "<td>".$volume." </td>";
-$output .= "</tr>";
-return $output;
+	$client = new rabbitMQClient("DMZRabbitMQ.ini","testServer");
+	if (isset($argv[1]))
+	{
+	$msg = $argv[1];
+	}
+	else
+	{
+	$msg = "search2N";
+	}
+	$request = array();
+	$request['type'] = "search2N";
+	//send search to DMZ end
+	$request['search2N'] = $search;
+	//Send/Get response and save as variable
+	$response = $client->send_request($request);
+	//PHP_EOL should echo in from backend 
+	//May induce unintended effects
+	echo "".PHP_EOL;
+	echo "Sent and recieved detail search info.";
+	echo"\n";
+
+	//return API data
+	return $response
+
 }
-*/
 function doRequestBalance($username) {
 	global $db;
 	//save query as variable
@@ -163,27 +152,37 @@ function doShowTrading($username) {
 	errorCheck($db);
 }
 
-function doBuyStock2($username, $symbol, $amount) {
+function doBuyStock($username, $symbol, $amount) {
 	global $db;
-/*
-	//Fetch current stock info from API
-	$alpha_vantage = new Client('9J4N8FA67HVHYZG0');
-	$stockinfo = $alpha_vantage
-    	->stock()
-    	->intraday($symbol, AlphaVantage\Resources\Stock::INTERVAL_1MIN);
-	$fetchedsymbol = $stockinfo["Meta Data"]["2. Symbol"];
-	//Check if symbol exists
-	if ($symbol != $fetchedsymbol)
-		return "ERROR! Invalid symbol detected!";
-	//Get stock LOW as buy price (NBBO)
-	$stocktime = $stockinfo["Meta Data"]["3. Last Refreshed"];
-	$stockpricestring = $stockinfo["Time Series (1min)"][$stocktime]["3. low"];
-	//convert price and amount to float, multiply stock by amount, then round.
-	$stockprice = floatval($stockpricestring);
-	$i_amount = intval($amount);
-	$t = $stockprice * $i_amount;
-	$total = round($t,2);
-*/
+
+$client = new rabbitMQClient("DMZRabbitMQ.ini","testServer");
+	if (isset($argv[1]))
+	{
+	$msg = $argv[1];
+	}
+	else
+	{
+	$msg = "buyStock2";
+	}
+	$request = array();
+	$request['type'] = "buyStock2";
+	//send buy variables to DMZ end
+	$request['username'] = $_SESSION["username"];
+	$request['amount'] = $_POST['amount'];
+	$request['symbol'] = $_POST['symbol'];
+	$request['message'] = $msg;
+	//recieve api info from DMZ as variable
+	$response = $client->send_request($request);
+	//PHP_EOL should echo in from backend 
+	//May induce unintended effects
+	echo "".PHP_EOL;
+	echo "Sent and recieved buy info.";
+	echo"\n";
+
+	//set new variables from fetched API info
+	$i_amount = $response[0]
+	$total = $response[1]
+
 	//Fetch user data from students
 	$s = "select * from students where BINARY username = '$username'";
 	($table = mysqli_query( $db,  $s ) )  or die( mysqli_error($db) );
@@ -235,6 +234,36 @@ function doSellStock($username, $symbol, $amount) {
 		echo "User doesn't have enough stock!\n\n";
 		return "ERROR! You don't have enough of that stock!";
 	}
+
+	//Call for API data here
+	$client = new rabbitMQClient("DMZRabbitMQ.ini","testServer");
+	if (isset($argv[1]))
+	{
+	$msg = $argv[1];
+	}
+	else
+	{
+	$msg = "sellStock2";
+	}
+	$request = array();
+	$request['type'] = "sellStock2";
+	//send sell variables to DMZ end
+	$request['username'] = $_SESSION["username"];
+	$request['amount'] = $_POST['amount'];
+	$request['symbol'] = $_POST['symbol'];
+	$request['message'] = $msg;
+	//set new variables from fetched API info
+	$response = $client->send_request($request);
+	//PHP_EOL should echo in from backend 
+	//May induce unintended effects
+	echo "".PHP_EOL;
+	echo "Sent and recieved sell info.";
+	echo"\n";
+
+	//return API data
+	$i_amount = $response[0];
+	$total = $response[1];
+
 /*
 	//Fetch current stock info from API
 	$alpha_vantage = new Client('9J4N8FA67HVHYZG0');
@@ -281,7 +310,7 @@ function requestProcessor($request) {
 	case "validate_session":
 		return doValidate($request['sessionId']);
 
-	/*case "search1S":
+	case "search1S":
 		return doSearch($request['search1S']);
 
 	case "search1N":
@@ -296,11 +325,12 @@ function requestProcessor($request) {
 	case "showTrading":
 		return doShowTrading($request['username']);
 
-	case "buyStock2":
+	case "buyStock":
 		return doBuyStock($request['username'], $request['symbol'], $request['amount']);
 	
 	case "sellStock":
 		return doSellStock($request['username'], $request['symbol'], $request['amount']);
+
 	}
 	return array("returnCode" => '0', 'message'=>"Server received request and processed.");
 }
