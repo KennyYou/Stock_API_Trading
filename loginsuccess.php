@@ -10,20 +10,23 @@ if ($_SESSION['logged'] == true)
 {
    echo "Welcome: ";
    echo $_SESSION["username"];
+   echo "<br>";
    echo "News feed: (Powered by RSS)";   
 //echo "USER NAME DISPLAYED";
 //$user = $_SESSION["user"];
 // echo $user;
 }
+
 //echo "USER NOT DISPLAYED";
  ?>
  
  <?php
-//Doing RSS from google news source
 
+//Doing RSS from google news source
 $xml=("https://news.google.com/rss/search?q=stocks&hl=en-US&gl=US&ceid=US:en");
 
 $xmlDoc = new DOMDocument();
+
 $xmlDoc->load($xml);
 
 //get elements from "<channel>"
@@ -34,7 +37,6 @@ $channel_link = $channel->getElementsByTagName('link')
 ->item(0)->childNodes->item(0)->nodeValue;
 $channel_desc = $channel->getElementsByTagName('description')
 ->item(0)->childNodes->item(0)->nodeValue;
-
 //output elements from "<channel>"
 $ee = ("<p><a href='" . $channel_link
   . "'>" . $channel_title . "</a>");
@@ -56,18 +58,10 @@ for ($i=0; $i<=10; $i++) {
   //echo ($item_desc . "</p>");
 }
 //END RSS FEATURE
+
+
 ?>
 
-<?php
-// the message should run on script startup
-$msg = "TESTING\nFirst line of text\nSecond line of text";
-
-// use wordwrap() if lines are longer than 70 characters
-$msg = wordwrap($msg,70);
-
-// send email
-mail("ky77@njit.edu","Testing Email",$msg);
-?>
 
 </head>
 <body>
