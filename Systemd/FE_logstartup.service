@@ -1,0 +1,13 @@
+[Unit]
+Description=RMQ Startup
+StartLimitIntervalSec=6
+
+
+[Service]
+Restart=always
+RestartSec=6
+ExecStart=/usr/bin/php /home/kenny/test/The_Project/logserver.php
+
+
+[Install]
+WantedBy=multi-user.target
