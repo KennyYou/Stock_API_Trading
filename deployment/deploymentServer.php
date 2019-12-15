@@ -10,7 +10,7 @@ include('deployDB.php');
 function doSend($version, $user, $ip, $namepkg, $description, $path) {
 	
 	global $db;
-	$output = shell_exec("sshpass -f '/home/jdm68/git/The_Project/sshpass' scp -P 22 ~/git/The_Project/packages/my_files.tar.gz jdm68@localhost:/home/jdm68/ ");
+	$output = shell_exec("sshpass -f '/home/jdm68/git/The_Project/sshpass'| scp -P 22 ~/git/The_Project/packages/my_files.tar.gz $user@$ip:~/ ");
 	$connect = mysqli_connect('localhost', 'deploy', '490password', 'deployment');
 
 	if (!$connect) {
@@ -19,21 +19,22 @@ function doSend($version, $user, $ip, $namepkg, $description, $path) {
 	else {
 		echo "SUCCESS: Connection Established to DB\n";		
 	}
-/*
+
 	$request["type"] = "pkg";
 	$request["pkg_name"]= $namepkg;
 	$request["path"] = $path; 
 	$request["description"] = $description;
 	
 	$version = substr($namepkg, -3);
-	$version_string[1] = ",";
+	$version[1] =  ".";
 	$ver_ID = floatval($version);
-*/
-	$pkgName = "my_files";
-	$desc = "apple";
-	$version = "0.1";
+	$var_dump($ver_ID);
+
+	$pkgName = $namepkg;
+	$desc = $description;
+	$version = ;
 	$validated = 'T';
-	$pkgPath = '/home/jdm68/';
+	$pkgPath = $path;
 	
 	if ($query = mysqli_prepare($connect, "INSERT INTO packages (pkgName, description, version, validated, pkgPath) VALUES (?,?,?,?,?)")) {
 		$query ->bind_param('sssss', $pkgName, $desc, $version, $validated, $pkgPath);

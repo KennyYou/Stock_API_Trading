@@ -16,7 +16,6 @@ else
 
 $request = array();
 $request['type'] = "sendPkgInfo";
-$request['version'] = "0.1";
 $request['user'] = "jdm68";
 $request['ip'] = "192.168.2.110";	// <-- changed to 'localhost' for testing purposes
 $request['namepkg'] = "my_files";
