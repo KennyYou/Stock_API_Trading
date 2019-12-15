@@ -1,5 +1,5 @@
 #!/usr/bin/php
-<?php
+<?php 
 
 require_once('../path.inc');
 require_once('../rabbitMQLib.inc');
@@ -8,40 +8,46 @@ include('deployDB.php');
 
 // FUNCTION LIST
 function doSend($version, $user, $ip, $namepkg, $description, $path) {
-
+	
 	global $db;
-	$output = shell_exec("sshpass -f '/home/jdm68/git/The_Project/sshpass' scp -P 22 ~/git/The_Project/packages/my_files.tar.gz jdm68@192.168.2.110:/home/jdm68/git/The_Project/packages/ ");
+	$output = shell_exec("sshpass -f '/home/jdm68/git/The_Project/sshpass' scp -P 22 ~/git/The_Project/packages/my_files.tar.gz jdm68@localhost:/home/jdm68/ ");
 	$connect = mysqli_connect('localhost', 'deploy', '490password', 'deployment');
 
 	if (!$connect) {
-		echo ("mySQL ERROR: " . mysqli_connect_error());
+		echo ("mySQL ERROR: " . mysqli_connect_error());	
 	}
 	else {
-		echo "SUCCESS: Connection Established to DB\n";
+		echo "SUCCESS: Connection Established to DB\n";		
 	}
 /*
 	$request["type"] = "pkg";
 	$request["pkg_name"]= $namepkg;
-	$request["path"] = $path;
+	$request["path"] = $path; 
 	$request["description"] = $description;
-*/
+	
 	$version = substr($namepkg, -3);
 	$version_string[1] = ",";
 	$ver_ID = floatval($version);
-
+*/
+	$pkgName = "my_files";
+	$desc = "apple";
+	$version = "0.1";
+	$validated = 'T';
+	$pkgPath = '/home/jdm68/';
+	
 	if ($query = mysqli_prepare($connect, "INSERT INTO packages (pkgName, description, version, validated, pkgPath) VALUES (?,?,?,?,?)")) {
-		$query ->bind_param("ssh", 'my_files', 'apple', '0.1', 'T', '/home/jdm68/git/The_Project');
-		$query ->execute();
+		$query ->bind_param('sssss', $pkgName, $desc, $version, $validated, $pkgPath);
+		$query ->execute(); 
 		echo "INSERTED INTO dbname database " .PHP_EOL;
 		echo "ROWS CHANGED: " . $query -> affected_rows . PHP_EOL;
 	}
-
+	
 	errorCheck($db);
 }
 
 
 function doGetPkg($request) {
-
+	
 	global $db;
 	echo "REQUEST TAKEN".PHP_EOL;
 	var_dump($request);
@@ -69,11 +75,11 @@ function requestProcessor($request) {
 	if(!isset($request['type'])) {
 		return "ERROR: Unsupported message type!";
 	}
-
+	
 	switch ($request['type']) {
 	case "sendPkgInfo":
 		return doSend($request['version'], $request['user'], $request['ip'], $request['namepkg'], $request['description'], $request['path']);
-
+	
 /*	case 'getPkg':
 		return doGetPkg($request['request']);
 	}
