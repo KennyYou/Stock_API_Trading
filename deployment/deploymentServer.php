@@ -29,6 +29,7 @@ function doDeployPkg($version, $user, $ip, $namePkg, $description, $pkgPath) {
 		else {echo "Data successfully inserted into deployment database! Rows changed: " . $query -> affected_rows . PHP_EOL;}
 		
 	errorCheck($db);
+	}
 }
 
 function doGetPkg($request) {
