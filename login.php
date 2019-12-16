@@ -27,11 +27,7 @@ $request['type'] = "login";
 $request['username'] = $_POST['username'];
 $request['password'] = $_POST['pass'];
 $request['message'] = $msg;
-//May not need double check before merging
-for ($x = 0; $x <= 2; $x++) {
-echo "REQUEST ERROR!" . PHP_EOL;
-logger(__FILE__ . " | " . "Error! CHECK CONNECTION");
-}
+
 $response = $client->send_request($request);
 echo "Request Failure".PHP_EOL;
 print_r($response);
@@ -39,28 +35,27 @@ print_r($response);
 echo "\n\n";
 //If not in the database
 if ($response == 0) {
-	for ($x = 0; $x <= 2; $x++) {
-  	echo "REQUEST ERROR!" . PHP_EOL;
-	logger( __FILE__ . " | " . "Error! Bad Request Type: Check connection with database");
-	} 
+	//$date = date_create();
 	header("location:loginerror.html");
 	//Sends error log out 3 times
+	for ($x = 0; $x <= 2; $x++) {
+    echo "REQUEST ERROR!" . PHP_EOL;
+	logger( __FILE__ . " : " . __LINE__ . " :error: " . "Bad Request Type, check user in database");
+	} 
+	
 	}
-//Testing out response types either this or | Else will work
 if ($response == 1) {
 	$_SESSION['logged'] = true;
 	$_SESSION["username"] = $request['username'];
 	//$name = $_SESSION['username'];
 	header("Location: loginsuccess.php");
 }
-//Testing this out
-if (!$response) {
-	//set for 2 
-	for ($x = 0; $x <= 2; $x++) {
-    	echo "REQUEST ERROR!" . PHP_EOL;
-	logger( __FILE__ . " | " . "Error! Check Connection: Connection Timed out");
-	} 
-	or die("Login Error, Check connection and try again");
-	header("location:loginerror.html");
+//Hit if no connection or response
+else {
+for ($x = 0; $x <= 2; $x++) {
+echo "REQUEST ERROR!" . PHP_EOL;
+logger( __FILE__ . " : " . __LINE__ . " :error: " . "CHECK CONNECTION");
 }
+}
+
 ?>
