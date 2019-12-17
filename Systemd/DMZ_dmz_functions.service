@@ -1,0 +1,12 @@
+[Unit]
+Description=RMQ Server Startup
+StartLimitIntervalSec=6
+
+[Service]
+Restart=always
+RestartSec=6
+ExecStart=/usr/bin/php /var/www/The_Project/dmz_functions.php
+
+
+[Install]
+WantedBy=multi-user.target
