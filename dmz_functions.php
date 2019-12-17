@@ -14,6 +14,15 @@ $alpha_vantage = new Client('9J4N8FA67HVHYZG0');
 
 //FUNCTION LIST
 
+//Doing RSS from google news source
+
+function RSS() {
+$xml=("https://news.google.com/rss/search?q=stocks&hl=en-US&gl=US&ceid=US:en");
+return $xml;
+}
+//END RSS FEATURE
+
+
 function doSearch($search) {
 	$ch = curl_init("https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=" . $search . "&apikey=9J4N8FA67HVHYZG0");
 	curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -77,8 +86,13 @@ return $output;
 //send output back to backend
 }
 
+function doPortfolioCron($stockArray) {
+	foreach ($stockArray as $stock) {
+		
+
+}
+
 function doBuyStock($symbol, $amount) {
-	global $db;
 	//Fetch current stock info from API
 	$alpha_vantage = new Client('9J4N8FA67HVHYZG0');
 	$stockinfo = $alpha_vantage
@@ -104,66 +118,14 @@ function doBuyStock($symbol, $amount) {
 	
 
 	//At this point, you are done with collecting API data and need database data, so idealy the needed values would be sent back to the backend through RabbitMQ. The rest of this function would be done on the backend and is unnedded here.
-/*
-	//Fetch user data from students
-	$s = "select * from students where BINARY username = '$username'";
-	($table = mysqli_query( $db,  $s ) )  or die( mysqli_error($db) );
-	while ( $r = mysqli_fetch_array($table,MYSQLI_ASSOC) ) 
-	{
-		$bal= $r["bal"];
-		if ($bal - $total < 0)
-		{
-			echo "Nope! Not enough cash.\n\n";
-			return "ERROR! Insufficent funds for stock purchase!";
-		}
-	};
-	$s = "update students set bal = bal - '$total' where BINARY username = '$username' ";
-	mysqli_query ($db, $s);
-	$s = "insert into trading (username, type, symbol, shares, date, cost) values ('$username', 'buying', '$symbol', '$i_amount', NOW(), $total)";
-	mysqli_query ($db, $s);
-	//If new stock, insert into table. Else, update existing data.
-	$s = "select * from ".$username."_stocks where symbol = '$symbol'";
-	$testq = mysqli_query($db, $s);
-	$testarray = mysqli_fetch_array($testq);
-	if (is_null($testarray))
-	{
-		$s = "insert into ".$username."_stocks (symbol, amt) values ('$symbol','$i_amount')";
-	mysqli_query ($db, $s);
-	}
-	else
-	{
-	$s = "update ".$username."_stocks set amt = amt + '$i_amount' where symbol = '$symbol' ";
-	mysqli_query ($db, $s);
-	}
-	echo "Successful buy!\n\n";
-	return "Your transaction was successful! You have bought ".$i_amount." shares of ".$symbol." stock for $".$total."!";
-	errorCheck($db);
-*/
 
 }
+
 
 function doSellStock($symbol, $amount) {
 
 	//The beginning of this function starts on the backend, and if successful, would pass on to a dmz function
-/*
-	global $db;
-	//Fetch stock amounts from [username]_stocks
-	$s = "select * from ".$username."_stocks where symbol = '$symbol'";
-	$testq = mysqli_query($db, $s);
-	$testarray = mysqli_fetch_array($testq);
-	if (is_null($testarray))
-	{
-		echo "User doesn't have that stock!\n\n";
-		return "ERROR! You haven't bought that stock!";
-	}
-	if ($testarray['amt'] - (intval($amount)) < 0)
-	{
-		echo "User doesn't have enough stock!\n\n";
-		return "ERROR! You don't have enough of that stock!";
-	}
 
-	//DMZ end starts here.
-*/
 	//Fetch current stock info from API
 	$alpha_vantage = new Client('9J4N8FA67HVHYZG0');
 	$stockinfo = $alpha_vantage
@@ -181,17 +143,6 @@ function doSellStock($symbol, $amount) {
 	return $sellarray;
 
 	//Send needed values to backend. Rounding can happen either beforehand or afterwards.
-/*
-	$s = "update students set bal = bal + '$total' where BINARY username = '$username' ";
-	mysqli_query ($db, $s);
-	$s = "insert into trading (username, type, symbol, shares, date, cost) values ('$username', 'selling', '$symbol', '$i_amount', NOW(), $total)";
-	mysqli_query ($db, $s);
-	$s = "update ".$username."_stocks set amt = amt - '$i_amount' where symbol = '$symbol' ";
-	mysqli_query ($db, $s);
-	echo "Successful sell!\n\n";
-	return "Your transaction was successful! You have sold ".$i_amount." shares of ".$symbol." stock for $".$total."!";
-	errorCheck($db);
-*/
 
 
 }
@@ -207,12 +158,18 @@ function requestProcessor($request) {
 	}
 	
 	switch ($request['type']) {
+	
+	case "RSS":
+		return RSS($request['RSS']);
 
 	case "search2S":
 		return doSearch($request['search2S']);
 
 	case "search2N":
 		return doDetailSearch($request['search2N']);
+
+	case "portfolioCron":
+		return doPortfolioCron($request['stockArray']);
 
 	case "buyStock2":
 		return doBuyStock($request['symbol'], $request['amount']);
@@ -223,14 +180,6 @@ function requestProcessor($request) {
 	return array("returnCode" => '0', 'message'=>"Server received request and processed.");
 }
 
-
-function errorCheck($db) {
-	if ($db->errno != 0) {
-		echo "Failed to execute query:".PHP_EOL;
-		echo __FILE__.':'.__LINE__.":error: ".$db->error.PHP_EOL;
-		exit(0);
-	}
-}
 
 $server = new rabbitMQServer("DMZRabbitMQ.ini","testServer");
 
