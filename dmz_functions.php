@@ -101,8 +101,8 @@ function doPortfolioCron($stockArray) {
 		$cur_stock = $stockinfo["Time Series (Daily)"][$today]["4. close"];
 		$priceArray = array("old"=>$old_stock, "cur"=>$cur_stock);
 		$fullPriceArray[] = array($stock=>$priceArray);
-	return $fullPriceArray;
-}
+	}
+		return $fullPriceArray;
 }
 
 function doBuyStock($symbol, $amount) {
