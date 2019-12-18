@@ -72,7 +72,7 @@ for ($i=0; $i<=10; $i++) {
 <a class="active" href="profile.php">PROFILE</a> 
 <a class="active" href="buy.php">BUY</a> 
 <a class="active" href="sell.php">SELL</a> 
-<a class="active" href="graph.html">GRAPH</a> 
+<a class="active" href="graph.php">GRAPH</a> 
 <a class="active" href="index.html">LOGOUT<a>
 </div>
 
