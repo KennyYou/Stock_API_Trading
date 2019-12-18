@@ -303,7 +303,14 @@ function doSellStock($username, $symbol, $amount) {
 	return "Your transaction was successful! You have sold ".$i_amount." shares of ".$symbol." stock for $".$total."!";
 	errorCheck($db);
 }
-	
+
+function doUpdateEmail($username, $pert){
+	global $db;
+	$s = "update students set p_percent = '$pert' where BINARY username = '$username' ";
+	mysqli_query ($db, $s);
+	return "Updated email percent of ".$username." to ".$pert."% !";
+	errorCheck($db);
+}
 
 //CODE "STARTS" HERE (server recieves requests then chooses function)
 function requestProcessor($request) {
@@ -346,6 +353,9 @@ function requestProcessor($request) {
 	
 	case "sellStock":
 		return doSellStock($request['username'], $request['symbol'], $request['amount']);
+
+	case "updateEmail":
+		return doUpdateEmail($request['username'], $request['pert']);
 
 	}
 	return array("returnCode" => '0', 'message'=>"Server received request and processed.");
