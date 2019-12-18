@@ -25,10 +25,11 @@ echo"\n";
 foreach ($fetchUsers as $User) {
 	$ShowStocks = mysqli_query($db, "SELECT symbol FROM ".$User."_stocks");
 	$fetchStocks = array();
-	while ($row_stock = mysqli_fetch_assoc($ShowStocks))
-		$fetchStocks[] = $row_stock["symbol"];
-	//Start DMZ connection and return array of 
 	$client = new rabbitMQClient("DMZRabbitMQ.ini","testServer");
+	while ($row_stock = mysqli_fetch_assoc($ShowStocks)){
+		$fetchStocks[] = $row_stock["symbol"];
+	}
+	//Start DMZ connection and return array of 
 	if (isset($argv[1]))
 	{
 	$msg = $argv[1];
@@ -49,8 +50,18 @@ foreach ($fetchUsers as $User) {
 	echo "".PHP_EOL;
 	echo "Sent and recieved stock info.";
 	echo "\n";
+	
 	//Here you deconstruct the array and assign the values to each stock in the user's tables.
+	foreach ($response as $symbol => $stock){
+		echo $symbol;
+		echo "\n";
+		$old_price = $response[$symbol]["old"];
+		$cur_price = $response[$symbol]["cur"];
+		$s = "update ".$User."_stocks set old_price = $old_price, cur_price = $cur_price where symbol = '$symbol' ";
+		mysqli_query ($db, $s);
+	}
 }
 errorCheck($db);
-?>
 
+exit(0);
+?>
