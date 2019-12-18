@@ -32,16 +32,17 @@ function doLogin($username, $password) {
 	else {
 		// if no match found, return false
 		echo "Welp, couldn't find the username specified...\n\n";
-		return false;
+		return 0;
 	}
  	errorCheck($db);
 }
 
-function doRegister($username, $password) {
+function doRegister($username, $password, $email) {
 	global $db;
-	//sanitize username and password
+	//sanitize username password and email
 	$cleanusername = mysqli_real_escape_string($db, $username);
 	$cleanpassword = mysqli_real_escape_string($db, $password);
+	$cleanemail = mysqli_real_escape_string($db, $email);
 	
 	// check to see if the username exists first
 	$q = mysqli_query($db, "SELECT * FROM students WHERE BINARY username = '$cleanusername'");
@@ -56,13 +57,38 @@ function doRegister($username, $password) {
 		$salty = "taterswithsalt";
 		$passhash = hash('sha256',$salty.$cleanpassword);
 		// no match, so insert the values into the DB
-		$q = mysqli_query($db, "INSERT INTO students (username, password, start_bal, bal) VALUES ('$cleanusername', '$passhash', 10000.00, 10000.00)");
+		$q = mysqli_query($db, "INSERT INTO students (username, password, email, start_bal, bal, p_percent) VALUES ('$cleanusername', '$passhash', '$cleanemail', 10000.00, 10000.00, 10)");
 		echo "Inserted values successfully!\n\n";
 		//Next, create stock table for user
-		$q = mysqli_query($db, "CREATE TABLE ".$cleanusername."_stocks (symbol varchar(15), amt int);");
+		$q = mysqli_query($db, "CREATE TABLE ".$cleanusername."_stocks (symbol varchar(15), amt int, old_price decimal(12,2), cur_price decimal(12,2));");
 		return "Registration successful!";
 	}
 	errorCheck($db);
+}
+
+function doRSSFeed(){
+
+	$client = new rabbitMQClient("DMZRabbitMQ.ini","testServer");
+	if (isset($argv[1]))
+	{
+	$msg = $argv[1];
+	}
+	else
+	{
+	$msg = "RSS";
+	}
+	$request = array();
+	$request['type'] = "RSS";
+	//Get response and save as variable
+	$response = $client->send_request($request);
+	//PHP_EOL should echo in from backend 
+	//May induce unintended effects
+	echo "".PHP_EOL;
+	echo "recieved RSS info.";
+	echo"\n";
+
+	//return API data
+	return $response;
 }
 
 function doSearch($search) {
@@ -181,6 +207,8 @@ $client = new rabbitMQClient("DMZRabbitMQ.ini","testServer");
 	//set new variables from fetched API info
 	$i_amount = $response[0];
 	$total = $response[1];
+	$old_price = $response[2];
+	$cur_price = $response[3];
 
 	//Fetch user data from students
 	$s = "select * from students where BINARY username = '$username'";
@@ -198,13 +226,13 @@ $client = new rabbitMQClient("DMZRabbitMQ.ini","testServer");
 	mysqli_query ($db, $s);
 	$s = "insert into trading (username, type, symbol, shares, date, cost) values ('$username', 'buying', '$symbol', '$i_amount', NOW(), $total)";
 	mysqli_query ($db, $s);
-	//If new stock, insert into table. Else, update existing data.
+	//If new stock, insert into table and add Portfolio values. Else, update existing data.
 	$s = "select * from ".$username."_stocks where symbol = '$symbol'";
 	$testq = mysqli_query($db, $s);
 	$testarray = mysqli_fetch_array($testq);
 	if (is_null($testarray))
 	{
-		$s = "insert into ".$username."_stocks (symbol, amt) values ('$symbol','$i_amount')";
+		$s = "insert into ".$username."_stocks (symbol, amt, old_price, cur_price) values ('$symbol','$i_amount', '$old_price', '$cur_price')";
 	mysqli_query ($db, $s);
 	}
 	else
@@ -290,7 +318,10 @@ function requestProcessor($request) {
 		return doLogin($request['username'], $request['password']);
 
 	case "register":
-		return doRegister($request['username'], $request['password']);
+		return doRegister($request['username'], $request['password'],$request['email']);
+
+	case "RSS":
+		return doRSSFeed();
 
 	case "validate_session":
 		return doValidate($request['sessionId']);
