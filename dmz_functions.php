@@ -87,9 +87,21 @@ return $output;
 }
 
 function doPortfolioCron($stockArray) {
+	$fullPriceArray = array();
 	foreach ($stockArray as $stock) {
-		
-
+		$alpha_vantage = new Client('9J4N8FA67HVHYZG0');
+		$stockinfo = $alpha_vantage
+    		->stock()
+    		->daily($stock);
+		//set today and yesterday variables
+		$yesterday = date('Y-m-d', strtotime("-1 days"));
+		$today = date('Y-m-d');
+		//Get stock CLOSE as old_stock and cur_stock
+		$old_stock = $stockinfo["Time Series (Daily)"][$yesterday]["4. close"];
+		$cur_stock = $stockinfo["Time Series (Daily)"][$today]["4. close"];
+		$priceArray = array("old"=>$old_stock, "cur"=>$cur_stock);
+		$fullPriceArray[] = array($stock=>$priceArray);
+	return $fullPriceArray;
 }
 
 function doBuyStock($symbol, $amount) {
