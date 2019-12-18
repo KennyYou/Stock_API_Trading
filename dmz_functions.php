@@ -87,22 +87,32 @@ return $output;
 }
 
 function doPortfolioCron($stockArray) {
-	$fullPriceArray = array();
+	//$fullPriceArray = array();
 	foreach ($stockArray as $stock) {
-		$alpha_vantage = new Client('9J4N8FA67HVHYZG0');
-		$stockinfo = $alpha_vantage
-    		->stock()
-    		->daily($stock);
-		//set today and yesterday variables
-		$yesterday = date('Y-m-d', strtotime("-1 days"));
-		$today = date('Y-m-d');
+		echo $stock;
+		echo "\n";
+		$ch = curl_init("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" .$stock. "&apikey=9J4N8FA67HVHYZG0");
+	curl_setopt($ch, CURLOPT_HEADER, 0);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+	$curl_results = curl_exec($ch);
+	curl_close($ch);
+	$today = date('Y-m-d');
+	$yesterday = date('Y-m-d', strtotime("-1 days"));
+	echo $today;
+	echo "\n";
+	echo $yesterday;
+	$jsonarray = json_decode($curl_results, true);
+	$os_unround = floatval($jsonarray['Time Series (Daily)'][$yesterday]['4. close']);
+	$cs_unround = floatval($jsonarray['Time Series (Daily)'][$today]['4. close']);
+	$old_stock = round($os_unround,2);
+	$cur_stock = round($cs_unround,2);
+		echo $old_stock;
+		echo "\n";
 		//Get stock CLOSE as old_stock and cur_stock
-		$old_stock = $stockinfo["Time Series (Daily)"][$yesterday]["4. close"];
-		$cur_stock = $stockinfo["Time Series (Daily)"][$today]["4. close"];
 		$priceArray = array("old"=>$old_stock, "cur"=>$cur_stock);
-		$fullPriceArray[] = array($stock=>$priceArray);
+		$fullPriceArray[$stock] = $priceArray;
 	}
-		return $fullPriceArray;
+	return $fullPriceArray;
 }
 
 function doBuyStock($symbol, $amount) {
