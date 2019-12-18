@@ -103,6 +103,7 @@ function doPortfolioCron($stockArray) {
 		$fullPriceArray[] = array($stock=>$priceArray);
 	return $fullPriceArray;
 }
+}
 
 function doBuyStock($symbol, $amount) {
 	//Fetch current stock info from API
