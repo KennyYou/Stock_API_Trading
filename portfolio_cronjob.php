@@ -50,13 +50,28 @@ foreach ($fetchUsers as $User) {
 	echo "".PHP_EOL;
 	echo "Sent and recieved stock info.";
 	echo "\n";
-	
+	//Get user email and portfolio percent before looking at stocks
+	$s = "SELECT * FROM students WHERE username = $User";
+	$t = mysqli_query ($db, $s);
+	while ($r = mysqli_fetch_assoc($t)){
+		$p_percent = $r["p_percent"];
+		$mailaddress = $r["email"];
+	}
 	//Here you deconstruct the array and assign the values to each stock in the user's tables.
 	foreach ($response as $symbol => $stock){
 		echo $symbol;
 		echo "\n";
 		$old_price = $response[$symbol]["old"];
 		$cur_price = $response[$symbol]["cur"];
+		$percent_diff = (($cur_price - $old_price)/$old_price)*100;
+		//if current price is (percent) more or less than old price, send email to user!
+		if (($percent_diff > $p_percent) or ($percent_diff < -$p_percent)){
+			$mailsubject = "Stock alert for ".$User." for stock ".$symbol."!";
+			$mailbody .= "<br><br> This email has been sent automatically to inform you of a major change to one of your stocks!<br>";
+			$mailbody .= "<br>Stock ".$symbol." is now at ".$percent_diff."% of it's current value! you should act accordingly!<br>";
+			$mailbody .= "<br>(As a reminder, your email alert percentage is set to ".$p_percent."%. This can be changed in your settings.<br>";
+			mail($mailaddress, $mailsubject, $mailbody);
+			}
 		$s = "update ".$User."_stocks set old_price = $old_price, cur_price = $cur_price where symbol = '$symbol' ";
 		mysqli_query ($db, $s);
 	}
