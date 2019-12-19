@@ -15,8 +15,6 @@
 - [Creating the Front-End](https://github.com/KennyYou/The_Project#creating-the-front-end)
   - [Setting Up an Apache2 Server](https://github.com/KennyYou/The_Project#setting-up-an-apache2-server)
 - [Creating the Deployment Server](https://github.com/KennyYou/The_Project#creating-the-deployment-server)
-- [Creating the Demilitarized Zone (DMZ)](https://github.com/KennyYou/The_Project#creating-the-demilitarized-zone-dmz)
-- [Connecting the AlphaVantage API](https://github.com/KennyYou/The_Project#connecting-the-alphavantage-api)
 - [Getting Distributed Logging Set Up](https://github.com/KennyYou/The_Project#getting-distributed-logging-set-up)
 - [Using Listeners with systemd](https://github.com/KennyYou/The_Project#using-listeners-with-systemd)
 
@@ -136,9 +134,6 @@ When you use the command `ssh user@ip_address`, you will be able to access the p
   
 This will give access to the server to send a file to the user needing it. For instance, a .txt file can be transferred from one endpoint to the next, the host will send to the user and it will be in their local directory.
 
-## Creating the Back-End
-TBA
-
 ## Creating the Front-End
 ### Setting Up an Apache2 Server
 All files for apache2 that need to be displayed on the web and hosted need to go into files.
@@ -152,15 +147,6 @@ In order to enable the website on the hosted machine run the commands:
 a2ensite example.com
 a2dissite example.com
 ```
-
-## Creating the Deployment Server
-TBA
-
-## Creating the Demilitarized Zone (DMZ)
-TBA
-
-## Connecting the AlphaVantage API
-TBA
 
 ## Getting Distributed Logging Set Up
 Logging set up is with a listener and depending on what machine you want an error log to be generated on. Running a function automatically when hitting an error to incur a so-called, 'graceful-exit' prevents users from reading error documentation. While keeping the connection for RabbitMQ on a seperate Exchange and Queue. Our is within:
@@ -189,10 +175,6 @@ Firewall Commands to allow Deny all and allow RMQ and SSH
 $ sudo ufw status Status: inactive
 
 $ sudo ufw default deny incoming Default incoming policy changed to 'deny' (be sure to update your rules accordingly)
-
-$ sudo ufw allow to any port 22 proto tcp $ sudo ufw allow to any port 5672 proto tcp
-=======
-TBA
 
 ## Firewall Commands to allow Deny all and allow RMQ and SSH
 $ sudo ufw status
