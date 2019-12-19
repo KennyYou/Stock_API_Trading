@@ -141,7 +141,17 @@ TBA
 
 ## Creating the Front-End
 ### Setting Up an Apache2 Server
-TBA
+All files for apache2 that need to be displayed on the web and hosted need to go into files.
+```
+/var/www/
+```
+Whereas editing the `/etc/hosts` file will be able to change the website name to match the IP address of the machine that is hosting the website allowing you to connect. 
+
+In order to enable the website on the hosted machine run the commands:
+```
+a2ensite example.com
+a2dissite example.com
+```
 
 ## Creating the Deployment Server
 TBA
@@ -153,9 +163,35 @@ TBA
 TBA
 
 ## Getting Distributed Logging Set Up
-TBA
-
+Logging set up is with a listener and depending on what machine you want an error log to be generated on. Running a function automatically when hitting an error to incur a so-called, 'graceful-exit' prevents users from reading error documentation. While keeping the connection for RabbitMQ on a seperate Exchange and Queue. Our is within:
+```
+rabbitMQErrorLog.ini
+```
+Thus when having other listeners open, you do not recieve the a message meant for another listener.
 ## Using Listeners with systemd
+Running a script automatically is used with the code: 
+```
+[Unit]
+Description=RMQ Startup
+StartLimitIntervalSec=6
+
+[Service]
+Restart=always
+RestartSec=6
+ExecStart=/usr/bin/php -> Name of script you want to autorun <-
+
+[Install]
+WantedBy=multi-user.target
+```
+Where even when crashing the script will auto run, in order to prevent stalling on systems. 
+
+Firewall Commands to allow Deny all and allow RMQ and SSH
+$ sudo ufw status Status: inactive
+
+$ sudo ufw default deny incoming Default incoming policy changed to 'deny' (be sure to update your rules accordingly)
+
+$ sudo ufw allow to any port 22 proto tcp $ sudo ufw allow to any port 5672 proto tcp
+=======
 TBA
 
 ## Firewall Commands to allow Deny all and allow RMQ and SSH

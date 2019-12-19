@@ -27,10 +27,6 @@ $request['type'] = "login";
 $request['username'] = $_POST['username'];
 $request['password'] = $_POST['pass'];
 $request['message'] = $msg;
-for ($x = 0; $x <= 3; $x++) {
-echo "REQUEST ERROR!" . PHP_EOL;
-logger( __FILE__ . " : " . __LINE__ . " :error: " . "CHECK CONNECTION");
-}
 $response = $client->send_request($request);
 echo "Request Failure".PHP_EOL;
 print_r($response);
@@ -41,9 +37,9 @@ if ($response == 0) {
 	//$date = date_create();
 	header("location:loginerror.html");
 	//Sends error log out 3 times
-	for ($x = 0; $x <= 3; $x++) {
+	for ($x = 0; $x <= 2; $x++) {
     echo "REQUEST ERROR!" . PHP_EOL;
-	logger( __FILE__ . " : " . __LINE__ . " :error: " . "Bad Request Type, check connection with database");
+	logger( __FILE__ . " : " . __LINE__ . " :error: " . "Bad Request, Check username in database");
 	} 
 	
 	}

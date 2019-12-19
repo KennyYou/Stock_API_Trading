@@ -1,0 +1,11 @@
+[Unit]
+Description=RMQ Startup
+StartLimitIntervalSec=6
+
+[Service]
+Restart=always
+RestartSec=8
+ExecStart=/usr/bin/php /home/mpm54/git/rabbitmqphp_example/logServer.php
+
+[Install]
+WantedBy=multi-user.target

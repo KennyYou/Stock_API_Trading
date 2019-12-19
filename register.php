@@ -1,9 +1,9 @@
 <?php
-
+/*
 //Check for any errors
 error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
 ini_set('display_errors', 1);
-
+*/
 //Grab required files 
 session_start();
 require_once('path.inc');
@@ -23,6 +23,7 @@ $request = array();
 $request['type'] = "register";
 $request['username'] = $_POST['username'];
 $request['password'] = $_POST['pass'];
+$request['email'] = $_POST['email'];
 $request['message'] = $msg;
 
 
