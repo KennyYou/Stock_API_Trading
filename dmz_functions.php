@@ -194,6 +194,11 @@ function doSellStock($symbol, $amount) {
 
 
 }
+
+function doSendMail($address, $subject, $body){
+	mail($address, $subject, $body);
+	return "Mail sent!\n";
+}
 	
 
 //CODE "STARTS" HERE (server recieves requests then chooses function)
@@ -227,6 +232,9 @@ function requestProcessor($request) {
 
 	case "graph2":
 		return doGraphSearch2($request['searchgraph']);
+
+	case "mail":
+		return doSendMail($request['address'], $request['subject'], $request['body']);
 	}
 	return array("returnCode" => '0', 'message'=>"Server received request and processed.");
 }
