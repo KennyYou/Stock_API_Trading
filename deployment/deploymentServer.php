@@ -16,59 +16,103 @@ require_once("$it490path/deployment/deployDB.php");
 
 // Function List
 
-function doRollbackPkg ($type, $pkgMachineType, $destTier, $pkgName, $version, $rbVersion, $userName, $ipAddress) {
+function doRollbackPkg ($type, $pkgMachineType, $destTier, $pkgName, $version, $userName) {
+
+
 
       global $db;
 
-
-
-      echo "Rollback request received" . PHP_EOL;
+      echo "\nRollback request received!" . PHP_EOL;
 
       echo "Request Type: " . $type . PHP_EOL;
 
-      echo "Package Tier Type: " . $pkgMachineType . PHP_EOL;
+      echo "Origin Machine Type: " . $pkgMachineType . PHP_EOL;
 
-      echo "Destination Tier (Dev, QA, Production): " . $destTier . PHP_EOL;
+      echo "Tier (DEV, QA, PROD): " . $destTier . PHP_EOL;
 
       echo "Package Name: " . $pkgName . PHP_EOL;
 
       echo "Problematic Version: " . $version . PHP_EOL;
 
-      echo "Revert Version: " . $rbVersion . PHP_EOL;
+
+
+			// mark the given package version as bad
+
+			// check if it exists first, then mark as bad
+
+			$q1 = mysqli_query($db, "SELECT * FROM packages WHERE pkgName = '$pkgName' AND version = '$version'");
+
+			if (mysqli_num_rows($q1) <= 0) {
+
+        echo "The package you're trying to mark as bad ($pkgName-$version) does not exist!\n";
+
+        return;
+
+			}
+
+			$q2 = mysqli_query($db, "UPDATE packages SET valid = 0 WHERE pkgName = '$pkgName' AND version = '$version'");
+
+			echo "$pkgName-$version successfully marked as bad! Rows changed: " . mysqli_affected_rows($db) . PHP_EOL;
 
 
 
-      // get the most recent version of the package marked as good
+      // get the most recent version of the package marked as good; check if it exists first
 
-      $query = mysqli_query($db, "SELECT version, valid FROM packages WHERE pkgName = '$pkgName' AND valid = 1");
+      $q3 = mysqli_query($db, "SELECT version FROM packages WHERE pkgName = '$pkgName' AND valid = 1 ORDER BY version DESC LIMIT 1");
 
-      echo "A previous version has been found! Rolling back..." . PHP_EOL;
+			if (mysqli_num_rows($q3) <= 0) {
+
+        echo "No rollback version exists for this package ($pkgName)!\n";
+
+        return;
+
+			}
+
+			while ($r = mysqli_fetch_array ($q3, MYSQLI_ASSOC)) {
+
+    		$dbRbVersion = $r["version"];
+
+				echo "A previous version ($dbRbVersion) has been found! Rolling back..." . PHP_EOL;
 
 
 
-      $output = shell_exec("sshpass -f '/home/jdm68/pwDir/jdm68' scp jdm68@192.168.2.110:/home/jdm68/packages/$pkgName-$version.tar.gz $pkgName-$version.tar.gz"); //  rm /home/jdm68/packages/$filename
+				// delete the bad package from the target system
+
+        // copy the older version to the target
+
+        $targetHost = strtolower($pkgMachineType) . strtolower($destTier);
+
+	      $output = shell_exec("sshpass -f '/home/jdm68/pwDir/$userName' ssh $userName@$targetHost 'rm -r /home/$userName/Packages/$pkgName-$version/';
+
+        sshpass -f '/home/jdm68/pwDir/$userName' scp -P 22 /home/jdm68/Packages/$pkgName-$dbRbVersion.tar.gz $userName@$targetHost:/home/$userName/Packages/$pkgName-$dbRbVersion.tar.gz;
+
+        sshpass -f '/home/jdm68/pwDir/$userName' ssh $userName@$targetHost 'tar -C /home/$userName/Packages/$pkgName-$dbRbVersion/ -xzfP /home/$userName/Packages/$pkgName-$dbRbVersion.tar.gz'");
+
+
+
+        echo "Successfully rolled back " . $pkgName . " to " . $dbRbVersion . "!\n" . PHP_EOL;
+
+      }
 
 }
 
 
 
-function doDeployPkg ($type, $pkgMachineType, $destTier, $pkgName, $version, $unused, $userName, $ipAddress) {
+function doDeployPkg ($type, $pkgMachineType, $destTier, $pkgName, $version, $userName) {
+
+
 
       global $db;
 
+      echo "\nDeploy request received!" . PHP_EOL;
 
+      echo "Request Type: " . $type . PHP_EOL;
 
-      echo "Deploy request received!" . PHP_EOL;
+      echo "Origin Machine Type: " . $pkgMachineType . PHP_EOL;
 
-    	echo "Request Type: " . $type . PHP_EOL;
+      echo "Tier (DEV, QA, PROD): " . $destTier . PHP_EOL;
 
-    	echo "Package Tier Type: " . $pkgMachineType . PHP_EOL;
-
-    	echo "Destination Tier (Dev, QA, Production): " . $destTier . PHP_EOL;
-
-    	echo "Package Name: " . $pkgName . PHP_EOL;
-
-    	echo "Version: " . $version . PHP_EOL;
+      echo "Package Name: " . $pkgName . PHP_EOL;
 
 
 
@@ -76,7 +120,7 @@ function doDeployPkg ($type, $pkgMachineType, $destTier, $pkgName, $version, $un
 
       if (mysqli_num_rows(mysqli_query($db, "SELECT * FROM packages WHERE pkgName = '$pkgName' AND version = '$version'")) <= 0) {
 
-        echo "The package you're trying to deploy ($pkgName-$version.tar.gz) does not exist!";
+        echo "The package you're trying to deploy ($pkgName-$version) does not exist!\n";
 
         return;
 
@@ -96,7 +140,7 @@ function doDeployPkg ($type, $pkgMachineType, $destTier, $pkgName, $version, $un
 
           // tell user the package is bad and will not deploy if marked as bad
 
-          echo "The package you're trying to deploy ($pkgName-$version.tar.gz) has been marked as bad! This file will not be deployed; please deploy a package that is known to be good.";
+          echo "The package you're trying to deploy ($pkgName-$version.tar.gz) has been marked as bad! This file will not be deployed; please deploy a package that is known to be good.\n";
 
           return;
 
@@ -106,43 +150,61 @@ function doDeployPkg ($type, $pkgMachineType, $destTier, $pkgName, $version, $un
 
 
 
-    	#echo "Pushing " . $pkgName . " on " . $destTier ." " . $pkgMachineType;
+    	echo "Deploying " . $pkgName . "-" . $version . ".tar.gz" . " to " . strtoupper($destTier) . " " . strtoupper($pkgMachineType) . "..." . PHP_EOL;
 
-    	# execute shell script to install backend package
 
-    	echo "Deploying " . $pkgName . "-" . $version . ".tar.gz" . " to " . $destTier . " " . $pkgMachineType . "..." . PHP_EOL;
 
       $filename = "$pkgName-$version.tar.gz";
 
-      shell_exec("cat /home/jdm68/packages/$filename | sshpass -f '/home/jdm68/pwDir/jdm68' ssh jdm68@192.168.2.110 cat > /home/jdm68/deploy/$filename");
+      $targetHost = strtolower($pkgMachineType) . strtolower($destTier);
 
-      echo "successfully deployed " . $pkgName . "-" . $version . ".tar.gz!" . PHP_EOL;
+
+
+      shell_exec("sshpass -f '/home/jdm68/pwDir/$userName' scp -P 22 /home/jdm68/Packages/$filename $userName@$targetHost:/home/$userName/Packages/$filename;
+
+      sshpass -f '/home/jdm68/pwDir/$userName' ssh $userName@$targetHost 'mkdir /home/$userName/Packages/$pkgName-$version/';
+
+      sshpass -f '/home/jdm68/pwDir/$userName' ssh $userName@$targetHost 'tar -C /home/$userName/Packages/$pkgName-$version/ -xzfP /home/$userName/Packages/$filename'");
+
+
+
+      echo "Successfully deployed " . $pkgName . "-" . $version . ".tar.gz to " . strtoupper($destTier) . " " . strtoupper($pkgMachineType) . "!\n" . PHP_EOL;
 
 }
 
 
 
-function doBundlePkg ($type, $pkgMachineType, $destTier, $pkgName, $version, $unused, $userName, $ipAddress) {
+function doBundlePkg ($type, $pkgMachineType, $destTier, $pkgName, $version, $userName) {
+
+
 
       global $db;
 
-      echo "Bundle request received!" . PHP_EOL;
+      echo "\nBundle request received!" . PHP_EOL;
 
       echo "Request Type: " . $type . PHP_EOL;
 
-      echo "Package Tier Type: " . $pkgMachineType . PHP_EOL;
+      echo "Origin Machine Type: " . $pkgMachineType . PHP_EOL;
 
-      echo "Destination Tier (Dev, QA, Production): " . $destTier . PHP_EOL;
+      echo "Tier (DEV, QA, PROD): " . $destTier . PHP_EOL;
 
       echo "Package Name: " . $pkgName . PHP_EOL;
 
-  		echo "SCP initiatied... ";
+  		echo "Bundle transfer initiatied... ";
+
+
 
       $filename = "$pkgName-$version.tar.gz";
 
-      shell_exec("cat /home/jdm68/packages/$filename | sshpass -f '/home/jdm68/pwDir/jdm68' ssh jdm68@192.168.2.110 cat > /home/jdm68/$filename");
+      $targetHost = strtolower($pkgMachineType) . strtolower($destTier);
 
-  		echo "$pkgName-$version.tar.gz received!";
+
+
+      shell_exec("sshpass -f '/home/jdm68/pwDir/$userName' scp -P 22 $userName@$targetHost:/home/$userName/Packages/$filename /home/jdm68/Packages/$filename");
+
+
+
+  		echo "$filename received!";
 
 
 
@@ -151,8 +213,6 @@ function doBundlePkg ($type, $pkgMachineType, $destTier, $pkgName, $version, $un
       $dt = date('Y-m-d H:i:s');
 
   		$query = mysqli_query($db, "INSERT INTO packages (pkgName, version, uploadDateTime, originMachine, destTier, valid) VALUES ('$pkgName', '$version', '$dt', '$pkgMachineType', '$destTier', 1)") or mysqli_error($db);
-
-
 
     		if (mysqli_affected_rows($db) < 0) {echo "\nERROR: " . mysqli_error($db);}
 
@@ -174,19 +234,19 @@ function requestProcessor($request) {
 
         case "rollback":
 
-          doRollbackPkg($request['type'],$request['pkgMachineType'],$request['destTier'],$request['pkgName'],$request['version'],$request['rbVersion'], $request['userName'], $request['ipAddress']);
+          doRollbackPkg($request['type'],$request['pkgMachineType'],$request['destTier'],$request['pkgName'],$request['version'], $request['userName']);
 
           break;
 
         case "deploy":
 
-          doDeployPkg($request['type'],$request['pkgMachineType'],$request['destTier'],$request['pkgName'],$request['version'],$request['rbVersion'], $request['userName'], $request['ipAddress']);
+          doDeployPkg($request['type'],$request['pkgMachineType'],$request['destTier'],$request['pkgName'],$request['version'], $request['userName']);
 
           break;
 
         case "bundle":
 
-          doBundlePkg($request['type'],$request['pkgMachineType'],$request['destTier'],$request['pkgName'],$request['version'],$request['rbVersion'], $request['userName'], $request['ipAddress']);
+          doBundlePkg($request['type'],$request['pkgMachineType'],$request['destTier'],$request['pkgName'],$request['version'], $request['userName']);
 
           break;
 
@@ -195,6 +255,8 @@ function requestProcessor($request) {
       return array("returnCode" => '0', 'message'=>"Server received request and processed");
 
     }
+
+
 
     $server = new rabbitMQServer("$it490path/deployment/deploy.ini","testServer");
 
