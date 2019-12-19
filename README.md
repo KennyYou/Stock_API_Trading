@@ -129,7 +129,17 @@ TBA
 
 ## Creating the Front-End
 ### Setting Up an Apache2 Server
-TBA
+All files for apache2 that need to be displayed on the web and hosted need to go into files.
+```
+/var/www/
+```
+Whereas editing the `/etc/hosts` file will be able to change the website name to match the IP address of the machine that is hosting the website allowing you to connect. 
+
+In order to enable the website on the hosted machine run the commands:
+```
+a2ensite example.com
+a2dissite example.com
+```
 
 ## Creating the Deployment Server
 TBA
@@ -144,4 +154,18 @@ TBA
 TBA
 
 ## Using Listeners with systemd
-TBA
+Running a script automatically is used with the code: 
+```
+[Unit]
+Description=RMQ Startup
+StartLimitIntervalSec=6
+
+[Service]
+Restart=always
+RestartSec=6
+ExecStart=/usr/bin/php -> Name of script you want to autorun <-
+
+[Install]
+WantedBy=multi-user.target
+```
+Where even when crashing the script will auto run, in order to prevent stalling on systems. 
