@@ -172,3 +172,10 @@ ExecStart=/usr/bin/php -> Name of script you want to autorun <-
 WantedBy=multi-user.target
 ```
 Where even when crashing the script will auto run, in order to prevent stalling on systems. 
+
+Firewall Commands to allow Deny all and allow RMQ and SSH
+$ sudo ufw status Status: inactive
+
+$ sudo ufw default deny incoming Default incoming policy changed to 'deny' (be sure to update your rules accordingly)
+
+$ sudo ufw allow to any port 22 proto tcp $ sudo ufw allow to any port 5672 proto tcp
