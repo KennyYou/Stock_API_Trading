@@ -151,8 +151,11 @@ TBA
 TBA
 
 ## Getting Distributed Logging Set Up
-TBA
-
+Logging set up is with a listener and depending on what machine you want an error log to be generated on. Running a function automatically when hitting an error to incur a so-called, 'graceful-exit' prevents users from reading error documentation. While keeping the connection for RabbitMQ on a seperate Exchange and Queue. Our is within:
+```
+rabbitMQErrorLog.ini
+```
+Thus when having other listeners open, you do not recieve the a message meant for another listener.
 ## Using Listeners with systemd
 Running a script automatically is used with the code: 
 ```
