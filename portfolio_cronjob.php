@@ -74,8 +74,26 @@ foreach ($fetchUsers as $User) {
 			$mailbody .= "Stock $symbol is now at $percent_diff% of it's current value! you should act accordingly!";
 			$mailbody .= "(As a reminder, your email alert percentage is set to $p_percent%. This can be changed in your settings.";
 			echo $mailbody;
-			mail($mailaddress, $mailsubject, $mailbody);
-			echo "\n Mail sent!";
+			$client = new rabbitMQClient("DMZRabbitMQ.ini","testServer");
+			//DMZ MAIL
+			if (isset($argv[1]))
+			{
+			$msg = $argv[1];
+			}
+			else
+			{
+			$msg = "sendmail";
+			}
+			$request = array();
+			$request['type'] = "sendmail";
+			//send stock array to DMZ end
+			$request['address'] = $mailaddress;
+			$request['subject'] = $mailsubject;
+			$request['body'] = $mailbody;
+			$request['message'] = $msg;
+			//recieve stock prices from DMZ as associative array
+			$response = $client->send_request($request);
+			echo $request;
 			}
 		$s = "update ".$User."_stocks set old_price = $old_price, cur_price = $cur_price where symbol = '$symbol' ";
 		mysqli_query ($db, $s);
