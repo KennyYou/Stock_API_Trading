@@ -2,6 +2,16 @@
 <html>
 <body>
 <head>
+<div class="topnav">
+
+<a class="active" href="loginsuccess.php">HOME</a> 
+<a class="active" href="profile.php">PROFILE</a> 
+<a class="active" href="buy.php">BUY</a> 
+<a class="active" href="sell.php">SELL</a> 
+<a class="active" href="graph.php">GRAPH</a> 
+<a class="active" href="index.html">LOGOUT<a>
+</div>
+
 <h1> Welcome to the Stocks Page! </h1>
 <p> Brought to you by: Potato Situation </p>
  <?php 
@@ -20,10 +30,31 @@ if ($_SESSION['logged'] == true)
 //echo "USER NOT DISPLAYED";
  ?>
  
- <?php
+<?php
+require_once('path.inc');
+require_once('get_host_info.inc');
+require_once('rabbitMQLib.inc');
+$client = new rabbitMQClient("testRabbitMQ.ini","testServer");
+if (isset($argv[1]))
+{
+  $msg = $argv[1];
+}
+else
+{
+  $msg = "RSS";
+}
+//Send search request over
+$request['type'] = "RSS";
 
+$request['message'] = $msg;
+$response = $client->send_request($request);
+//PHP_EOL should echo in from backend
+echo "".PHP_EOL;
+
+//print_r($response['bal']);
+echo"\n";
 //Doing RSS from google news source
-$xml=("https://news.google.com/rss/search?q=stocks&hl=en-US&gl=US&ceid=US:en");
+$xml=$response;
 
 $xmlDoc = new DOMDocument();
 
@@ -66,15 +97,6 @@ for ($i=0; $i<=10; $i++) {
 </head>
 <body>
 <h2> ___________________________ </h2>
-<div class="topnav">
-
-<a class="active" href="loginsuccess.php">HOME</a> 
-<a class="active" href="profile.php">PROFILE</a> 
-<a class="active" href="buy.php">BUY</a> 
-<a class="active" href="sell.php">SELL</a> 
-<a class="active" href="graph.php">GRAPH</a> 
-<a class="active" href="index.html">LOGOUT<a>
-</div>
 
 <form method="POST">
 <h2>Search a Stock:</h2>

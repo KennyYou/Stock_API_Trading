@@ -12,23 +12,51 @@
 
 <form method="POST">
 <h2>Search a Stock:</h2>
-	<input type="text" name="searchg" placeholder="Enter a stock symbol:" required>
+	<input type="text" name="searchgraph" placeholder="Enter a stock symbol:" required>
 	<button type="submit">Search</button><br>
 </form>
+
 <?php
 
-//include('cache.php');
-
-$title = $_POST['searchg'];
-echo "<br>Stock History of stock symbol: " . $title;
 function media_graph($symbol, $args = '') {
 //Get response for data.
+ 
+$title = $_POST['searchgraph'];
+echo "<br>Stock History of stock symbol: " . $title;
 
-$response = '9J4N8FA67HVHYZG0';
+
+require_once('path.inc');
+require_once('get_host_info.inc');
+require_once('rabbitMQLib.inc');
+
+if(isset($_POST['searchgraph'])){
+
+$client = new rabbitMQClient("testRabbitMQ.ini","testServer");
+
+if (isset($argv[1]))
+{
+  $msg = $argv[1];
+}
+else
+{
+  $msg = "graph";
+}
+//Send search request over
+$request = array();
+$request['type'] = "graph";
+$request['searchgraph'] = $_POST['searchgraph'];
+
+$request['message'] = $msg;
+$response = $client->send_request($request);
+echo "".PHP_EOL;
+echo"\n";
+echo "<br>";
+} //End updating emails %
+
   $farray = array('width' => '1200', 'height' => '500','time' => '2','number' => '90',
-    'size' => 'full','interval' => '60','apikey' => $response,'cache' => 3600);
+    'size' => 'full','interval' => '60','cache' => 3600);
 
- /* Merge $args with $farray */
+ // Merge $args with $farray
  $farray = (empty($args)) ? $farray : array_merge($farray, $args);
 
  $stcks = 'alpha_vantage_stock_' . md5(serialize($farray) . $symbol);
@@ -65,11 +93,13 @@ $response = '9J4N8FA67HVHYZG0';
             break;
     }
 
-    $data = @file_get_contents('https://www.alphavantage.co/query?function=' . $series . '&symbol=' . $symbol . '&interval=' . $farray['interval'] . 'min&apikey=' . $farray['apikey'] . '&interval=' . $farray['interval'] . 'min&outputsize=' . $farray['size']);
+	//Hit response
+    $data = @file_get_contents($response[1] . $series . '&symbol=' . $symbol . '&interval=' . $farray['interval'] . 'min&apikey=' . $response[0] . '&interval=' . $farray['interval'] . 'min&outputsize=' . $farray['size']);
     if ($data === false) return '<p>Data currently unavailable.</p>';
     $data = json_decode($data, true);
     $data = $data[$series_name];
 	//Checking out the data recieved.
+	//Testing responses from the DMZ
 	//var_dump($data);
     if ($farray['number'] != '') $data = array_slice($data, 0, $farray['number'], true);
     $data = array_reverse($data, true);
@@ -122,10 +152,14 @@ $response = '9J4N8FA67HVHYZG0';
 }
 
 // Send out the user inputed function for graphing.
+/*
 if(isset($_POST['searchg'])){
 $request = $_POST['searchg'];
-echo media_graph($symbol = $request);
-}
+*/
+
+echo media_graph($symbol = $_POST['searchgraph']);
+
+
 //END PHP
 
 function readfunc($stcks, $data) {
