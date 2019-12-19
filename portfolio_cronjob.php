@@ -49,10 +49,11 @@ foreach ($fetchUsers as $User) {
 	//May induce unintended effects
 	echo "".PHP_EOL;
 	echo "Sent and recieved stock info.";
-	echo "\n";
+	echo "\n\n";
 	//Get user email and portfolio percent before looking at stocks
-	$s = "SELECT * FROM students WHERE username = $User";
-	$t = mysqli_query ($db, $s);
+	echo $User;
+	//Get p_percent and email
+	$t = mysqli_query ($db, "SELECT * FROM students WHERE username = '$User'");
 	while ($r = mysqli_fetch_assoc($t)){
 		$p_percent = $r["p_percent"];
 		$mailaddress = $r["email"];
@@ -63,14 +64,18 @@ foreach ($fetchUsers as $User) {
 		echo "\n";
 		$old_price = $response[$symbol]["old"];
 		$cur_price = $response[$symbol]["cur"];
-		$percent_diff = (($cur_price - $old_price)/$old_price)*100;
+		$p_unround = (($cur_price - $old_price)/$old_price)*100;
+		$percent_diff = round($p_unround,2);
 		//if current price is (percent) more or less than old price, send email to user!
-		if (($percent_diff > $p_percent) or ($percent_diff < -$p_percent)){
-			$mailsubject = "Stock alert for ".$User." for stock ".$symbol."!";
-			$mailbody .= "<br><br> This email has been sent automatically to inform you of a major change to one of your stocks!<br>";
-			$mailbody .= "<br>Stock ".$symbol." is now at ".$percent_diff."% of it's current value! you should act accordingly!<br>";
-			$mailbody .= "<br>(As a reminder, your email alert percentage is set to ".$p_percent."%. This can be changed in your settings.<br>";
+		if (($percent_diff > $p_percent) or ($percent_diff < (-1 * abs($p_percent)))){
+			echo "Sending mail to ".$mailaddress." with percent diff = ".$percent_diff." and p_percent = ".$p_percent." !\n\n\n";
+			$mailsubject = "Stock alert for $User for stock $symbol!";
+			$mailbody .= "This email has been sent automatically to inform you of a major change to one of your stocks!";
+			$mailbody .= "Stock $symbol is now at $percent_diff% of it's current value! you should act accordingly!";
+			$mailbody .= "(As a reminder, your email alert percentage is set to $p_percent%. This can be changed in your settings.";
+			echo $mailbody;
 			mail($mailaddress, $mailsubject, $mailbody);
+			echo "\n Mail sent!";
 			}
 		$s = "update ".$User."_stocks set old_price = $old_price, cur_price = $cur_price where symbol = '$symbol' ";
 		mysqli_query ($db, $s);
