@@ -1,24 +1,24 @@
 # Potato Situation's Final Systems Integration Project
 
-- [Abstract](https://github.com/KennyYou/The_Project/README.md#abstract)
-- [General Setup](https://github.com/KennyYou/The_Project/README.md#general-setup)
-- [Needed Packages](https://github.com/KennyYou/The_Project/README.md#needed-packages)
-- [Setting Up the General Network](https://github.com/KennyYou/The_Project/README.md#setting-up-the-general-network)
-  - [Setting a VM’s Bridged Adapter](https://github.com/KennyYou/The_Project/README.md#setting-a-vms-bridged-adapter)
-  - [Connecting to Machines on the Network](https://github.com/KennyYou/The_Project/README.md#connecting-to-machines-on-the-network)
-- [Setting Up a RabbitMQ Server](https://github.com/KennyYou/The_Project/README.md#setting-up-a-rabbitmq-server)
-  - [Install Erlang](https://github.com/KennyYou/The_Project/README.md#install-erlang)
-  - [Install RabbitMQ](https://github.com/KennyYou/The_Project/README.md#install-rabbitmq)
-- [Setting Up a MySQL Database](https://github.com/KennyYou/The_Project/README.md#setting-up-a-mysql-database)
+- [Abstract](https://github.com/KennyYou/The_Project#abstract)
+- [General Setup](https://github.com/KennyYou/The_Project#general-setup)
+- [Needed Packages](https://github.com/KennyYou/The_Project#needed-packages)
+- [Setting Up the General Network](https://github.com/KennyYou/The_Project#setting-up-the-general-network)
+  - [Setting a VM’s Bridged Adapter](https://github.com/KennyYou/The_Project#setting-a-vms-bridged-adapter)
+  - [Connecting to Machines on the Network](https://github.com/KennyYou/The_Project#connecting-to-machines-on-the-network)
+- [Setting Up a RabbitMQ Server](https://github.com/KennyYou/The_Project#setting-up-a-rabbitmq-server)
+  - [Install Erlang](https://github.com/KennyYou/The_Project#install-erlang)
+  - [Install RabbitMQ](https://github.com/KennyYou/The_Project#install-rabbitmq)
+- [Setting Up a MySQL Database](https://github.com/KennyYou/The_Project#setting-up-a-mysql-database)
 
-- [Creating the Back-End](https://github.com/KennyYou/The_Project/README.md#creating-the-back-end)
-- [Creating the Front-End](https://github.com/KennyYou/The_Project/README.md#creating-the-front-end)
-  - [Setting Up an Apache2 Server](https://github.com/KennyYou/The_Project/README.md#setting-up-an-apache2-server)
-- [Creating the Deployment Server](https://github.com/KennyYou/The_Project/README.md#creating-the-deployment-server)
-- [Creating the Demilitarized Zone (DMZ)](https://github.com/KennyYou/The_Project/README.md#creating-the-demilitarized-zone-dmz)
-- [Connecting the AlphaVantage API](https://github.com/KennyYou/The_Project/README.md#connecting-the-alphavantage-api)
-- [Getting Distributed Logging Set Up](https://github.com/KennyYou/The_Project/README.md#getting-distributed-logging-set-up)
-- [Using Listeners with systemd](https://github.com/KennyYou/The_Project/README.md#using-listeners-with-systemd)
+- [Creating the Back-End](https://github.com/KennyYou/The_Project#creating-the-back-end)
+- [Creating the Front-End](https://github.com/KennyYou/The_Project#creating-the-front-end)
+  - [Setting Up an Apache2 Server](https://github.com/KennyYou/The_Project#setting-up-an-apache2-server)
+- [Creating the Deployment Server](https://github.com/KennyYou/The_Project#creating-the-deployment-server)
+- [Creating the Demilitarized Zone (DMZ)](https://github.com/KennyYou/The_Project#creating-the-demilitarized-zone-dmz)
+- [Connecting the AlphaVantage API](https://github.com/KennyYou/The_Project#connecting-the-alphavantage-api)
+- [Getting Distributed Logging Set Up](https://github.com/KennyYou/The_Project#getting-distributed-logging-set-up)
+- [Using Listeners with systemd](https://github.com/KennyYou/The_Project#using-listeners-with-systemd)
 
 ## Abstract
 Potato Situation’s project offers a stock market website that allows users to invest in stocks with fake money they receive when they first sign up. Each user can buy and sell stocks within their own ecosystem or with the general market, and can search for the stock(s) they would like to purchase. It also offers a currency conversion feature, which converts a region’s currency into another region’s exchange rate. Every user has their own profile, and the website graphs out their data to interpret the presented data visually and evaluates their portfolio to let them know how well their stocks are performing.
@@ -56,17 +56,29 @@ Open a terminal window and type `ifconfig`, which will show your virtual machine
 
 **NOTE**: If you cannot use the `ifconfig` command, you may need to install the net-tools package first. Do this with `sudo apt install net-tools -y` and enter your password.
 
-Type the following commands:
+The system’s Network Manager has a missing configuration file. (This is not a bug from our project: rather, this is an Ubuntu-specific issue.) To create the needed missing file for networking to work properly while on bridged adapter mode, type `sudo touch /etc/NetworkManager/conf.d/10-globally-managed-devices.conf` and enter your password. Then, type `sudo nano /etc/NetworkManager/NetworkManager.conf`, which opens the file in Nano, a terminal text editor. If Vim (Vi IMproved) is more preferable, replace `nano` with `vim`.
+
+Edit the NetworkManager.conf file such that it looks like this:
 ```
-sudo touch /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
-sudo systemctl restart NetworkManager
+[main]
+plugins=ifupdown,keyfile
+
+[ifupdown]
+managed=true
+
+[device]
+wifi.scan-rand-mac-address=no
 ```
-The system’s Network Manager has a missing configuration file. (This is not a bug from our project: rather, this is an Ubuntu-specific issue.) The first command creates the needed missing file for networking to work properly while on bridged adapter mode, and the second one restarts the networking service. Check if the service is running by typing `systemctl status networking`. To get out of this command, hit CTRL + C.
+
+If using `nano`, press CTRL + X, which will make you quit the program. When prompted to save, hit ‘Y’, then press ENTER. If using `vim`, hit ESC and type `:wq`.
+
+Restart the networking service with `sudo systemctl restart NetworkManager.` Check if the service is running by typing `systemctl status networking`. To get out of this command, hit CTRL + C.
+
 Ping another machine connected to the local network and connect to an external website (e.g., Google, Facebook, etc.). If it doesn’t work, here are some solutions:
 1. ensure the other machine is powered on and connected to the same network
 2. check the previous steps and ensure they have been followed correctly
 
-Open the Settings application, and select “Network” from the left sidebar. On the right side, a section named “Wired” should appear. Click the gear icon.
+Open the Settings application, and select “Network” from the left sidebar. On the right side, a section named “Wired” should appear. Click the gear icon on the `enp0s3` (Ethernet) connection.
 
 Click on “IPv4” along the top of the window. Change the IPv4 method from “Automatic (DHCP)” to “Manual”. Under the “Addresses” section, add the IP address and network mask from the `ifconfig` command and enter the router’s IP address in the “Gateway” field (most routers have `192.168.1.1` as a default address). For DNS, Google’s Public DNS address (`8.8.8.8`) works well. When this is complete, click “Apply”. Open another terminal window and restart the networking service (`sudo systemctl restart NetworkManager`) and enter your password.
 
@@ -82,7 +94,7 @@ Next, install the apt-transport-https package by entering `sudo apt install apt-
 
 Add the following line into the file: `deb https://dl.bintray.com/rabbitmq-erlang/debian bionic erlang` (where *bionic* is the corresponding version of Ubuntu your machine is running—in this case, Ubuntu 18.04—and *erlang* is the latest version).
 
-If using `nano`, press CTRL + X, which will make you quit the program. When prompted to save, hit ‘Y’, then press ENTER. If using `vim`, hit ESC and type ‘:wq’.
+If using `nano`, press CTRL + X, which will make you quit the program. When prompted to save, hit ‘Y’, then press ENTER. If using `vim`, hit ESC and type `:wq`.
 
 Lastly, update the system’s package list by running `sudo apt update` and install Erlang with `sudo apt install erlang-base -y`.
 
@@ -179,3 +191,16 @@ $ sudo ufw status Status: inactive
 $ sudo ufw default deny incoming Default incoming policy changed to 'deny' (be sure to update your rules accordingly)
 
 $ sudo ufw allow to any port 22 proto tcp $ sudo ufw allow to any port 5672 proto tcp
+=======
+TBA
+
+## Firewall Commands to allow Deny all and allow RMQ and SSH
+$ sudo ufw status
+Status: inactive
+
+$ sudo ufw default deny incoming
+Default incoming policy changed to 'deny'
+(be sure to update your rules accordingly)
+
+$ sudo ufw allow  to any port 22 proto tcp
+$ sudo ufw allow  to any port 5672 proto tcp
