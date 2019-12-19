@@ -158,10 +158,17 @@ function doRequestBalance($username) {
 
 function doShowOwnedStock($username) {
 	global $db;
-	$ShowOwnedStock = mysqli_query($db, "SELECT symbol, amt FROM ".$username."_stocks");
+	$ShowOwnedStock = mysqli_query($db, "SELECT * FROM ".$username."_stocks");
 	$fetchStock = array();
-	while ($row_user = mysqli_fetch_assoc($ShowOwnedStock))
-		$fetchStock[] = $row_user;
+	while ($row_user = mysqli_fetch_assoc($ShowOwnedStock)){
+		$old_price = $row_user["old_price"];
+		$cur_price = $row_user["cur_price"];
+		$percent_diff = (($cur_price-$old_price)/$old_price) * 100;
+		$p_round = round($percent_diff, 2);
+		$p_format = "".$p_round."% stock price since yesterday.";
+		$fetchStock[] = array($row_user["symbol"], $row_user["amt"], $p_format);
+		}
+	echo $percent_diff;
 	echo "Stocks sent to client.";
 	return $fetchStock;
 	errorCheck($db);
@@ -312,6 +319,26 @@ function doUpdateEmail($username, $pert){
 	errorCheck($db);
 }
 
+function doReturnGraph($searchgraph){
+	$client = new rabbitMQClient("DMZRabbitMQ.ini","testServer");
+	if (isset($argv[1]))
+	{
+	$msg = $argv[1];
+	}
+	else
+	{
+	$msg = "graph2";
+	}
+	$request = array();
+	$request['type'] = "graph2";
+	//send buy variables to DMZ end
+	$request['searchgraph'] = $searchgraph;
+	//recieve api info from DMZ as variable
+	$response = $client->send_request($request);
+	return $response;
+}
+	
+
 //CODE "STARTS" HERE (server recieves requests then chooses function)
 function requestProcessor($request) {
 	echo "Received a request".PHP_EOL;
@@ -356,6 +383,9 @@ function requestProcessor($request) {
 
 	case "updateEmail":
 		return doUpdateEmail($request['username'], $request['pert']);
+
+	case "graph":
+		return doReturnGraph($request['searchgraph']);
 
 	}
 	return array("returnCode" => '0', 'message'=>"Server received request and processed.");
