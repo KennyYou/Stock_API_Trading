@@ -17,29 +17,24 @@
 </form>
 <?php
 
-include('cache.php');
+//include('cache.php');
 
 $title = $_POST['searchg'];
 echo "<br>Stock History of stock symbol: " . $title;
-function beliefmedia_alphavantage_quotes($symbol, $args = '') {
+function media_graph($symbol, $args = '') {
+//Get response for data.
+
 $response = '9J4N8FA67HVHYZG0';
-  $farray = array(
-    'width' => '1200',
-    'height' => '500',
-    'time' => '2',
-    'number' => '90',
-    'size' => 'full', 
-    'interval' => '60', 
-    'apikey' => $response,
-    'cache' => 3600
-  );
+  $farray = array('width' => '1200', 'height' => '500','time' => '2','number' => '90',
+    'size' => 'full','interval' => '60','apikey' => $response,'cache' => 3600);
 
  /* Merge $args with $farray */
  $farray = (empty($args)) ? $farray : array_merge($farray, $args);
 
- $transient = 'alpha_vantage_stock_' . md5(serialize($farray) . $symbol);
- $cachedposts = beliefmedia_get_transient($transient, $farray['cache']);
+ $stcks = 'alpha_vantage_stock_' . md5(serialize($farray) . $symbol);
+ $cachedposts = cachefunc($stcks, $farray['cache']);
 
+//If there isn't something already in the cache
  if ($cachedposts !== false) {
   return $cachedposts;
  } else {
@@ -74,6 +69,8 @@ $response = '9J4N8FA67HVHYZG0';
     if ($data === false) return '<p>Data currently unavailable.</p>';
     $data = json_decode($data, true);
     $data = $data[$series_name];
+	//Checking out the data recieved.
+	//var_dump($data);
     if ($farray['number'] != '') $data = array_slice($data, 0, $farray['number'], true);
     $data = array_reverse($data, true);
 
@@ -82,12 +79,6 @@ $response = '9J4N8FA67HVHYZG0';
     }
 
     $chart = ltrim($chart, ',');
-
-  /*
-	Borrowed Base code from this website, full credit for base code goes to owners. 
-	http://www.beliefmedia.com/stock-quote-graph-wordpress
-  Added in user interface for input and sending through rabbitMQ
-  */
     
    $return = "<script type='text/javascript' src='https://www.gstatic.com/charts/loader.js'></script>
     <script type='text/javascript'>
@@ -125,7 +116,7 @@ $response = '9J4N8FA67HVHYZG0';
  
     $return .= '<div id="chart_div_' . $interval . '" style="width: ' . $farray['width'] . 'px; height: ' . $farray['height'] . 'px;"></div>';
 
-   beliefmedia_set_transient($transient, $return, $farray['cache']);
+   readfunc($stcks, $return, $farray['cache']);
    return $return;
  }
 }
@@ -133,9 +124,42 @@ $response = '9J4N8FA67HVHYZG0';
 // Send out the user inputed function for graphing.
 if(isset($_POST['searchg'])){
 $request = $_POST['searchg'];
-echo beliefmedia_alphavantage_quotes($symbol = $request);
+echo media_graph($symbol = $request);
 }
 //END PHP
+
+function readfunc($stcks, $data) {
+
+  $location = '/path/to/public_html/your/cache/' . $stcks . '.txt';
+   
+  if (is_array($data)) $data = serialize($data);
+
+  $fp = @fopen($location, 'w');
+  $result = fwrite($fp, $data);
+  fclose($fp);
+
+ return ($result !== false) ? true : false;
+}
+
+
+function cachefunc($stcks, $cache = '10000') {
+
+
+  $location = '/path/to/public_html/your/cache/' . $stcks . '.txt';
+    
+  if ( file_exists($location) && (time() - $cache < filemtime($location)) ) {
+
+    $result = @file_get_contents($location);
+    if (beliefmedia_is_serialized($result) === true) $result = unserialize($result);
+    
+    return ($result) ? $result : false;
+
+  } else {
+
+    return false; 
+
+  }
+}
 ?>
 
 </body>
