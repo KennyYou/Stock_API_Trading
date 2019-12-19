@@ -5,6 +5,7 @@ require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 include('db.php');
+include('logfunction.inc');
 
 //FUNCTION LIST
 function doLogin($username, $password) {
@@ -394,6 +395,10 @@ function requestProcessor($request) {
 
 function errorCheck($db) {
 	if ($db->errno != 0) {
+		for ($x = 0; $x <= 2; $x++) {
+    			echo "REQUEST ERROR!" . PHP_EOL;
+			logger( __FILE__ . " : " . __LINE__ . " :error: " . "Database error! Check Database server.");
+		} 
 		echo "Failed to execute query:".PHP_EOL;
 		echo __FILE__.':'.__LINE__.":error: ".$db->error.PHP_EOL;
 		exit(0);
