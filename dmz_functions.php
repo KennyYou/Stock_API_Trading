@@ -114,6 +114,13 @@ function doPortfolioCron($stockArray) {
 	}
 	return $fullPriceArray;
 }
+function doGraphSearch2($searchgraph){
+	$key = '9J4N8FA67HVHYZG0';
+	$alpha = "https://www.alphavantage.co/query?function=";
+	$grapharray = array($key, $alpha);
+	echo "\nRecieved graph info!";
+	return $grapharray;
+}
 
 function doBuyStock($symbol, $amount) {
 	//Fetch current stock info from API
@@ -217,6 +224,9 @@ function requestProcessor($request) {
 	
 	case "sellStock2":
 		return doSellStock($request['symbol'], $request['amount']);
+
+	case "graph2":
+		return doGraphSearch2($request['searchgraph']);
 	}
 	return array("returnCode" => '0', 'message'=>"Server received request and processed.");
 }
