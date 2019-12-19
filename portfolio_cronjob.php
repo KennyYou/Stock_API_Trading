@@ -85,7 +85,7 @@ foreach ($fetchUsers as $User) {
 			$msg = "sendmail";
 			}
 			$request = array();
-			$request['type'] = "sendmail";
+			$request['type'] = "mail";
 			//send stock array to DMZ end
 			$request['address'] = $mailaddress;
 			$request['subject'] = $mailsubject;
