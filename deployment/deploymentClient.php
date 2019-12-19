@@ -74,6 +74,74 @@ else {
   $version = readline("Enter the package's version: ");
 
  
+$output = shell_exec("tar -zcvf /home/$user/Packages/$pkgName-$version.tar.gz /home/$user/Packages/$folderName/");
+
+}
+
+$user = get_current_user();
+
+$client = new rabbitMQClient("deploy.ini", "testServer");
+
+$request = array();
+
+$request['type'] = strtolower($type);
+
+$request['pkgMachineType'] = strtoupper($pkgMachineType);
+
+$request['destTier'] = strtoupper($destTier);
+
+$request['pkgName'] = $pkgName;
+
+$request['version'] = $version;
+
+$request['userName'] = $user; // get the local user's userName
+
+
+
+if($type == "bundle"){
+
+$request['folderName'] = $folderName;
+
+}
+
+//$request['message'] = $msg;
+
+// bundle the folder
+
+
+$response = $client -> send_request($request);
+
+echo "Sent your request message for $type!\n";
+
+?>
+
+
+
+  
+
+}
+
+else{echo "Not a valid action! Please try again.";
+
+  return;
+
+}
+
+$pkgName = readline("Enter the package's name: ");
+
+if ($type == "rollback") {
+
+  $version = readline("Enter the version number of the problematic package: ");
+
+
+
+}
+
+else {
+
+  $version = readline("Enter the package's version: ");
+
+ 
 
 }
 
