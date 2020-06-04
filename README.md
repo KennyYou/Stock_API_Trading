@@ -26,9 +26,6 @@ This project requires VirtualBox (a free virtualization application) and Ubuntu 
 
 There are also three main branches: development (Dev), quality assurance (QA), and production (Prod). The FE, BE, and DMZ all use these three branches and require a hot standby (HSB) on the Prod branch. DEP, on the other hand, does not follow this rule as it needs to deploy the packages from Dev to QA and QA to Prod.
 
-## Needed Packages
-TBA
-
 ## Setting Up the General Network
 ### Setting a VM’s Bridged Adapter
 In order to connect your virtual machine to other virtual machines on a shared local network and to the Internet, you will have to change your network adapter option to a bridged adapter.
